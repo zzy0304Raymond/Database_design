@@ -1,0 +1,13 @@
+/* global.css */
+body {
+    background: linear-gradient(120deg, #c1d8fd 0%, #c2e9fb 100%);
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #c6dcf2;
+    margin: 0;
+    padding: 0;
+  }
+  
+
+  
