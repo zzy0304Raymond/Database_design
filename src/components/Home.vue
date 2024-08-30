@@ -6,6 +6,7 @@
         v-model="searchQuery"
         placeholder="Search items..."
         class="search-bar"
+        clearable
       >
         <template #append>
           <el-button icon="el-icon-search" @click="searchItems">Search</el-button>
@@ -24,12 +25,16 @@
         <el-option label="Jewelry" value="Jewelry"></el-option>
       </el-select>
     </div>
+    <!-- 拍卖物品列表 -->
     <el-row :gutter="20" class="auction-list">
+      <!-- 使用 v-for 渲染每一个拍卖物品 -->
       <el-col :span="8" v-for="item in paginatedItems" :key="item.id">
         <el-card class="auction-item" shadow="hover">
-          <h2>{{ item.name }}</h2>
+          <!-- 物品图片 -->
           <img :src="item.imageUrl" alt="item.name" class="item-image" />
+          <h2>{{ item.name }}</h2>
           <p>Starting Bid: ${{ item.startingBid }}</p>
+          <!-- 查看详情按钮 -->
           <el-button type="primary" @click="viewItem(item.id)">View Details</el-button>
         </el-card>
       </el-col>
@@ -116,35 +121,74 @@ export default {
 <style scoped>
 .home {
   padding: 20px;
+  display: flex; /* 使用 Flex 布局 */
+  flex-direction: column; /* 垂直排列元素 */
+  align-items: center; /* 水平居中 */
+  background: #f5f7fa; /* 设置背景颜色 */
 }
-.search-filter-bar {
-  display: flex;
-  margin-bottom: 20px;
-}
-.search-bar {
-  flex: 2;
-  margin-right: 10px;
-}
-.filter-bar {
-  flex: 1;
-  min-width: 150px;
-}
-.auction-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-.auction-item {
-  margin: 10px;
-  padding: 10px;
-}
-.item-image {
+
+.navbar {
   width: 100%;
-  height: auto;
+  background-color: #2c3e50; /* 导航栏背景色 */
+  margin-bottom: 20px; /* 与下方内容间距 */
 }
+
+.nav-menu {
+  background-color: #2c3e50; /* 菜单背景色 */
+  color: white; /* 菜单文字颜色 */
+}
+
+.page-title {
+  font-size: 2.5rem; /* 标题字体大小 */
+  font-weight: bold; /* 标题字体加粗 */
+  margin: 20px 0; /* 上下间距 */
+  color: #34495e; /* 标题颜色 */
+  text-align: center; /* 居中对齐 */
+}
+
+.search-filter-bar {
+  display: flex; /* 使用 Flex 布局 */
+  width: 80%;
+  justify-content: space-between; /* 两端对齐 */
+  margin-bottom: 30px; /* 与下方内容间距 */
+}
+
+.search-bar,
+.filter-bar {
+  flex: 1; /* 平分 Flex 容器 */
+  margin: 0 10px; /* 左右间距 */
+  max-width: 300px; /* 最大宽度 */
+}
+
+.auction-list {
+  width: 100%;
+  display: flex; /* 使用 Flex 布局 */
+  flex-wrap: wrap; /* 换行显示 */
+  justify-content: center; /* 居中对齐 */
+}
+
+.auction-item {
+  margin: 10px; /* 四周间距 */
+  padding: 20px; /* 内边距 */
+  border-radius: 10px; /* 圆角 */
+  transition: box-shadow 0.3s ease; /* 阴影过渡效果 */
+}
+
+.auction-item:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 悬停时阴影效果 */
+}
+
+.item-image {
+  width: 100%; /* 图片宽度自适应 */
+  max-height: 200px; /* 图片最大高度 */
+  object-fit: cover; /* 保持图片比例 */
+  border-radius: 8px; /* 图片圆角 */
+  margin-bottom: 10px; /* 图片与下方文字的间距 */
+}
+
 .pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  margin-top: 20px; /* 与上方内容间距 */
+  display: flex; /* 使用 Flex 布局 */
+  justify-content: center; /* 居中对齐 */
 }
 </style>
