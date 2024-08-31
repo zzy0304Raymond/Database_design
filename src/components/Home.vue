@@ -1,6 +1,22 @@
 <template>
   <div class="home">
     <h1>Online Auction</h1>
+
+    <!-- 折扣推荐模块 -->
+    <div class="discount-section">
+      <h2>今日特惠</h2>
+      <el-carousel :interval="4000" arrow="always">
+        <el-carousel-item v-for="item in discountItems" :key="item.id">
+          <div class="discount-item">
+            <img :src="item.image" alt="折扣商品" />
+            <h3>{{ item.title }}</h3>
+            <p>优惠价: {{ item.price }}</p>
+          </div>
+        </el-carousel-item>
+      </el-carousel>
+    </div>
+
+    <!-- 搜索栏和过滤器 -->
     <div class="search-filter-bar">
       <el-input
         v-model="searchQuery"
@@ -25,6 +41,9 @@
         <el-option label="Jewelry" value="Jewelry"></el-option>
       </el-select>
     </div>
+
+
+
     <!-- 拍卖物品列表 -->
     <el-row :gutter="20" class="auction-list">
       <!-- 使用 v-for 渲染每一个拍卖物品 -->
@@ -39,6 +58,8 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!-- 翻页控件 -->
     <el-pagination
       @current-change="handlePageChange"
       :current-page="currentPage"
@@ -47,6 +68,15 @@
       :total="filteredItems.length"
       class="pagination"
     ></el-pagination>
+
+    <!-- 品牌介绍模块 -->
+    <div class="brand-intro">
+      <h2>品牌介绍</h2>
+      <p>我们的品牌致力于提供高品质产品，服务全球用户...</p>
+      <el-button type="primary" @click="learnMore">了解更多</el-button>
+    </div>
+
+
   </div>
 </template>
 
@@ -74,6 +104,11 @@ export default {
       currentPage: 1,
       itemsPerPage: 3,
       searchResults: [],
+      discountItems: [
+        { id: 1, title: 'Discount Item 1', price: '¥50', image: '/path_to_uploaded_image/image.png' },
+        { id: 2, title: 'Discount Item 2', price: '¥80', image: '/path_to_uploaded_image/image.png' },
+        { id: 3, title: 'Discount Item 3', price: '¥120', image: '/path_to_uploaded_image/image.png' },
+      ],
     };
   },
   computed: {
@@ -113,6 +148,10 @@ export default {
     },
     handlePageChange(val) {
       this.currentPage = val;
+    },
+    learnMore() {
+      // 跳转到品牌详情页
+      this.$router.push('/brand');
     },
   },
 };
@@ -191,4 +230,33 @@ export default {
   display: flex; /* 使用 Flex 布局 */
   justify-content: center; /* 居中对齐 */
 }
+
+.discount-section {
+  width: 100vw; /* 全屏宽度 */
+  margin: 20px 0;
+  padding: 20px 0;
+  background-color: #fff;
+  text-align: center;
+  overflow: hidden; /* 防止超出内容 */
+}
+
+.discount-item {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.discount-item img {
+  width: auto;
+  height: 150px; /* 图片高度 */
+  border-radius: 8px;
+}
+.brand-intro {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
 </style>
