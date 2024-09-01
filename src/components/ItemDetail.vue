@@ -13,11 +13,12 @@
       <!-- 右侧：商品信息和出价区域 -->
       <el-col :span="8" class="info-section">
         <h1 class="item-title">{{ item.name }}</h1>
-        <p class="item-price">US ${{ item.startingBid }}</p>
-        <p class="item-condition">Condition: {{ item.condition }}</p>
-        <div class="quantity-section">
-          <el-input-number v-model="quantity" :min="1" :max="item.stock" label="Quantity" />
-          <span class="stock-info">More than {{ item.stock }} available</span>
+        <p class="item-price">
+          Current Bid: US ${{ item.currentBid }} <br />
+          Minimum Next Bid: US ${{ minimumNextBid }}
+        </p>
+        <div class="bid-section">
+          <el-input-number v-model="bidAmount" :min="minimumNextBid" :step="bidIncrement" label="Your Bid" />
         </div>
         <div class="button-group">
           <el-button type="primary" @click="bidNow" class="bid-now-button">Bid Now</el-button>
@@ -71,36 +72,44 @@ export default {
   data() {
     return {
       item: {
-        images: [],  // 假设图片数组
+        images: [],
         name: '',
-        startingBid: 0,
         currentBid: 0,
+        startingBid: 0,
         description: '',
         condition: '',
-        details: '',  // 商品详细信息
+        details: '',
         stock: 1,
       },
       quantity: 1,
-      bids: [],  // 出价历史记录
+      bidAmount: 0, // 用户输入的出价金额
+      bidIncrement: 5, // 出价步长，最小加价金额
+      bids: [],
     };
   },
+  computed: {
+    minimumNextBid() {
+      return this.item.currentBid > 0
+        ? this.item.currentBid + this.bidIncrement
+        : this.item.startingBid;
+    },
+  },
   created() {
-    this.fetchItemDetails();  // 组件创建时获取商品详情
-    this.fetchBidHistory();  // 获取出价历史
+    this.fetchItemDetails();
+    this.fetchBidHistory();
   },
   methods: {
-    // 获取商品详情的方法
     fetchItemDetails() {
-      const itemId = this.$route.params.id;  // 从路由参数中获取商品ID
+      const itemId = this.$route.params.id;
       axios.get(`http://your-api-endpoint/auction-items/${itemId}`)
         .then(response => {
-          this.item = response.data;  // 将响应数据赋值给 item 对象
+          this.item = response.data;
+          this.bidAmount = this.minimumNextBid; // 设置默认出价为最小下一次出价
         })
         .catch(error => {
-          console.error('Error fetching item details:', error);  // 处理错误
+          console.error('Error fetching item details:', error);
         });
     },
-    // 获取出价历史
     fetchBidHistory() {
       const itemId = this.$route.params.id;
       axios.get(`http://your-api-endpoint/auction-items/${itemId}/bids`)
@@ -111,10 +120,21 @@ export default {
           console.error('Error fetching bid history:', error);
         });
     },
-    // 出价
     bidNow() {
-      this.$router.push('/checkout');  // 跳转到模拟的出价页面
-    },
+    if (this.bidAmount < this.minimumNextBid) {
+      this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
+      return;
+    }
+    // 传递出价金额和数量到支付页面
+    this.$router.push({
+      name: 'Payment',
+      params: {
+        itemName: this.item.name,
+        amount: this.bidAmount,
+        quantity: this.quantity
+      }
+    });
+  },
     // 添加到购物车
     addToCart() {
       // 实现添加到购物车的逻辑

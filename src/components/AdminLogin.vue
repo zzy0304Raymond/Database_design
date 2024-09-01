@@ -34,16 +34,20 @@
 import axios from 'axios'; // 引入 axios 用于发送 HTTP 请求
 
 export default {
-  name: 'AdminLogin', // 组件名称
+  name: 'AdminLogin',
   data() {
     return {
-      form: { // 表单数据对象
-        email: '', // 用户输入的邮箱
-        password: '', // 用户输入的密码
+      form: {
+        email: '',
+        password: '',
       },
+      isLoggingIn: false,
     };
   },
   methods: {
+    resetForm() {
+      this.$refs.form.resetFields();
+    },
     // 表单提交方法，首先进行表单验证
     submitForm() {
       this.$refs.form.validate((valid) => { // 使用 ref 进行表单验证
@@ -51,25 +55,28 @@ export default {
           this.login(); // 如果验证通过，调用 login 方法
         } else {
           console.log('error submit!!'); // 如果验证失败，输出错误信息
-          return false; // 阻止提交
+          this.resetForm();
+          return false;// 阻止提交
         }
       });
     },
     // 登录方法，向服务器发送登录请求
     login() {
+      this.isLoggingIn = true;
       axios.post('http://your-api-endpoint/admin/login', { // 使用 axios 发送 POST 请求
         email: this.form.email, // 提交邮箱
         password: this.form.password, // 提交密码
       })
       .then(response => {
-        console.log('Admin login successful:', response.data); // 登录成功后打印服务器返回的数据
-        // 假设成功后返回管理员令牌，将令牌存储到本地存储
         localStorage.setItem('adminToken', response.data.token);
         // 登录成功后跳转到管理员页面
         this.$router.push({ name: 'Admin' });
       })
       .catch(error => {
         console.error('Error logging in:', error); // 如果登录失败，打印错误信息
+      })
+      .finally(() => {
+        this.isLoggingIn = false;
       });
     },
   },

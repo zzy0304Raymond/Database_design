@@ -38,6 +38,7 @@ export default {
         email: '', // 用户输入的邮箱
         password: '', // 用户输入的密码
       },
+      isLoggingIn: false, // 增加登录状态
     };
   },
   methods: {
@@ -51,11 +52,17 @@ export default {
       .then(response => {
         console.log('Login successful:', response.data); // 打印登录成功的响应数据
         // 处理登录成功后的逻辑，比如保存用户信息到本地存储或状态管理
+        localStorage.setItem('authToken', token); // 保存 token
+        localStorage.setItem('userId', user.id); // 保存用户 ID
         this.$router.push({ name: 'Home' }); // 登录成功后跳转到首页
       })
       .catch(error => {
         console.error('Error logging in:', error); // 打印登录失败的错误信息
         // 处理登录失败的逻辑，比如显示错误消息
+        this.$message.error('Login failed. Please check your credentials.');
+      })
+      .finally(() => {
+        this.isLoggingIn = false;
       });
     },
   },

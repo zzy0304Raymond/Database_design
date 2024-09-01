@@ -1,5 +1,5 @@
 <template>
-  <div class="user-profile">
+  <div class="user-profile" v-if="isAuthenticated"> <!-- 只有登录后才显示 -->
     <!-- 用户资料卡片 -->
     <el-card class="profile-card">
       <div class="profile-header">
@@ -23,6 +23,9 @@
           <template #default>
             <p>Username: {{ user.username }}</p>
             <p>Email: {{ user.email }}</p>
+            <!-- 添加更多用户信息 -->
+            <p>Location: {{ user.location }}</p>
+            <p>Joined: {{ user.joinedDate }}</p>
           </template>
         </el-skeleton>
       </div>
@@ -60,6 +63,10 @@
         <el-form-item label="Avatar URL">
           <el-input v-model="editForm.avatar"></el-input> <!-- 头像 URL 输入框 -->
         </el-form-item>
+        <!-- 新增用户位置编辑 -->
+        <el-form-item label="Location">
+          <el-input v-model="editForm.location"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <!-- 取消按钮，关闭对话框 -->
@@ -78,24 +85,23 @@ export default {
   name: 'UserProfile', // 组件名称
   data() {
     return {
-      user: { // 用户数据对象
-        username: 'JohnDoe', // 默认用户名
-        email: 'john@example.com', // 默认邮箱
-        avatar: 'https://via.placeholder.com/100', // 默认头像
-      },
-      editForm: { // 编辑表单数据
-        username: '', // 编辑用户名
-        email: '', // 编辑邮箱
-        avatar: '', // 编辑头像 URL
-      },
-      bids: [], // 用户竞价历史数据
-      loading: true, // 加载状态
-      editProfileDialog: false, // 编辑对话框显示状态
+      user: {},
+      editForm: {},
+      bids: [],
+      loading: true,
+      editProfileDialog: false,
+      isAuthenticated: false, // 增加身份验证状态
     };
   },
   created() {
-    this.fetchUserData(); // 组件创建时获取用户数据
-    this.fetchBiddingHistory(); // 组件创建时获取竞价历史
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      this.isAuthenticated = true;
+      this.fetchUserData();
+      this.fetchBiddingHistory();
+    } else {
+      this.$router.push({ name: 'Login' });
+    }
   },
   methods: {
     // 获取用户数据
