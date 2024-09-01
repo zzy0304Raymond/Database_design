@@ -13,12 +13,16 @@
             <el-button type="primary" @click="fetchMessages">Reload</el-button>
           </el-empty>
           <el-list v-else>
-            <el-list-item v-for="message in paginatedMessages" :key="message.id">
+            <el-list-item v-for="message in paginatedMessages" :key="message.id" @click="openChat(message.senderId)">
               <el-card shadow="hover" class="message-card">
-                <h3>{{ message.title }}</h3>
-                <p>{{ message.content }}</p>
+                <div class="message-header">
+                  <img :src="message.senderAvatar" alt="avatar" class="avatar">
+                  <div class="message-info">
+                    <h3>{{ message.senderName }}</h3>
+                    <p>{{ truncateMessage(message.content) }}</p>
+                  </div>
+                </div>
                 <small>{{ formatTimestamp(message.timestamp) }}</small>
-                <el-button type="danger" size="mini" @click="deleteMessage(message.id)">Delete</el-button>
               </el-card>
             </el-list-item>
           </el-list>
@@ -86,23 +90,14 @@ export default {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
+    truncateMessage(message) {
+      return message.length > 50 ? message.slice(0, 50) + '...' : message;
+    },
     handlePageChange(page) {
       this.currentPage = page;
     },
-    deleteMessage(messageId) {
-      const userId = localStorage.getItem('userId');
-      axios.delete(`http://your-api-endpoint/users/${userId}/messages/${messageId}`)
-        .then(response => {
-          this.messages = this.messages.filter(message => message.id !== messageId);
-          this.$message({
-            message: 'Message deleted successfully',
-            type: 'success',
-          });
-        })
-        .catch(error => {
-          console.error('Error deleting message:', error);
-          this.$message.error('Failed to delete message');
-        });
+    openChat(senderId) {
+      this.$router.push({ name: 'Chat', params: { senderId } });
     },
   },
 };
@@ -124,5 +119,37 @@ export default {
 
 .message-card {
   margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.message-card:hover {
+  background-color: #f5f5f5;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.message-info {
+  flex: 1;
+}
+
+.message-info h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.message-info p {
+  margin: 0;
+  color: #555;
 }
 </style>
