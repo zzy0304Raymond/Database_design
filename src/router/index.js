@@ -7,6 +7,7 @@ import ItemDetail from '../components/ItemDetail.vue';
 import Admin from '../components/Admin.vue';
 import AdminLogin from '../components/AdminLogin.vue';
 import Inbox from '../components/Inbox.vue';
+import Chat from '../components/Chat.vue';  // 导入 Chat 组件
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -22,6 +23,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   { path: '/inbox', name: 'Inbox', component: Inbox },
+  { path: '/chat', name: 'Chat', component: Chat },
 ];
 
 

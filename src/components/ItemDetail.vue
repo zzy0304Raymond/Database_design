@@ -1,44 +1,65 @@
 <template>
   <div class="item-detail-container">
-    <!-- 商品详情卡片 -->
-    <el-card class="detail-card" shadow="always">
-      <el-row :gutter="20">
-        <!-- 左侧：商品图片 -->
-        <el-col :span="10" class="image-section">
-          <img :src="item.imageUrl" alt="item.name" class="item-image" />
-        </el-col>
+    <el-row :gutter="20">
+      <!-- 左侧：商品图片 -->
+      <el-col :span="16" class="image-section">
+        <el-carousel :interval="4000" arrow="always">
+          <el-carousel-item v-for="image in item.images" :key="image">
+            <img :src="image" alt="item.name" class="item-image" />
+          </el-carousel-item>
+        </el-carousel>
+      </el-col>
 
-        <!-- 右侧：商品信息和出价区域 -->
-        <el-col :span="14" class="info-section">
-          <div class="info-wrapper">
-            <h1 class="item-title">{{ item.name }}</h1>
-            <p class="item-price">Starting Bid: ${{ item.startingBid }}</p>
-            <p class="item-current-bid">Current Bid: ${{ item.currentBid || item.startingBid }}</p>
-            <p class="item-description">{{ item.description }}</p>
+      <!-- 右侧：商品信息和出价区域 -->
+      <el-col :span="8" class="info-section">
+        <h1 class="item-title">{{ item.name }}</h1>
+        <p class="item-price">US ${{ item.startingBid }}</p>
+        <p class="item-condition">Condition: {{ item.condition }}</p>
+        <div class="quantity-section">
+          <el-input-number v-model="quantity" :min="1" :max="item.stock" label="Quantity" />
+          <span class="stock-info">More than {{ item.stock }} available</span>
+        </div>
+        <div class="button-group">
+          <el-button type="primary" @click="bidNow" class="bid-now-button">Bid Now</el-button>
+          <el-button type="default" @click="addToCart" class="add-to-cart-button">Add to Cart</el-button>
+          <el-button type="default" @click="addToWishlist" class="add-to-watchlist-button">Add to Watchlist</el-button>
+        </div>
+        <p class="item-description">{{ item.description }}</p>
 
-            <!-- 竞价输入框和按钮 -->
-            <div class="bid-section">
-              <el-input
-                v-model="bidAmount"
-                placeholder="Enter your bid"
-                type="number"
-                class="bid-input"
-              />
-              <el-button type="primary" @click="placeBid" class="bid-button">
-                Place a Bid
-              </el-button>
-            </div>
-          </div>
-        </el-col>
-      </el-row>
+      </el-col>
+    </el-row>
 
-      <!-- 出价历史 -->
-      <el-table :data="bids" style="width: 100%" class="bid-history">
-        <el-table-column prop="user" label="User" width="150"></el-table-column>
-        <el-table-column prop="amount" label="Bid Amount" width="150"></el-table-column>
-        <el-table-column prop="time" label="Time"></el-table-column>
-      </el-table>
-    </el-card>
+    <!-- 出价历史 -->
+    <el-table :data="bids" style="width: 100%" class="bid-history">
+      <el-table-column prop="user" label="User" width="150"></el-table-column>
+      <el-table-column prop="amount" label="Bid Amount" width="150"></el-table-column>
+      <el-table-column prop="time" label="Time"></el-table-column>
+    </el-table>
+    
+    <!-- 商品详细信息 -->
+    <div class="product-details-container">
+      <div class="product-details">
+        <h2>Product Details</h2>
+        <p>{{ item.details }}</p>
+      </div>
+      <!-- 聊天功能按钮 -->
+      <el-button type="primary" @click="goToChat" class="chat-button">Chat with Seller</el-button>
+    </div>
+
+    <!-- 聊天窗口 -->
+    <el-dialog title="Chat with Seller" :visible.sync="chatVisible" width="50%">
+      <el-input
+        type="textarea"
+        v-model="chatMessage"
+        placeholder="Type your message here..."
+        class="chat-input"
+      ></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="chatVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="sendMessage">Send</el-button>
+      </span>
+    </el-dialog>
+    
   </div>
 </template>
 
@@ -49,8 +70,17 @@ export default {
   name: 'ItemDetail',
   data() {
     return {
-      item: {},  // 商品详情对象
-      bidAmount: 0,  // 用户输入的竞价金额
+      item: {
+        images: [],  // 假设图片数组
+        name: '',
+        startingBid: 0,
+        currentBid: 0,
+        description: '',
+        condition: '',
+        details: '',  // 商品详细信息
+        stock: 1,
+      },
+      quantity: 1,
       bids: [],  // 出价历史记录
     };
   },
@@ -81,20 +111,22 @@ export default {
           console.error('Error fetching bid history:', error);
         });
     },
-    // 提交竞价的方法
-    placeBid() {
-      const userId = localStorage.getItem('userId');  // 获取用户ID
-      axios.post(`http://your-api-endpoint/auction-items/${this.item.id}/bids`, {
-        userId: userId,
-        amount: this.bidAmount,  // 提交的竞价金额
-      })
-      .then(response => {
-        this.$message.success('Your bid has been placed successfully!');  // 显示成功提示
-        this.fetchBidHistory(); // 更新出价历史
-      })
-      .catch(error => {
-        this.$message.error('Failed to place bid. Please try again.');  // 显示错误提示
-      });
+    // 出价
+    bidNow() {
+      this.$router.push('/checkout');  // 跳转到模拟的出价页面
+    },
+    // 添加到购物车
+    addToCart() {
+      // 实现添加到购物车的逻辑
+      this.$message.success('Added to cart!');
+    },
+    // 添加到愿望清单
+    addToWishlist() {
+      // 实现添加到愿望清单的逻辑
+      this.$message.success('Added to watchlist!');
+    },
+    goToChat() {
+      this.$router.push('/chat');  // 跳转到聊天页面
     }
   },
 };
@@ -103,85 +135,164 @@ export default {
 <style scoped>
 .item-detail-container {
   display: flex;
-  justify-content: center; /* 中心对齐 */
-  padding: 40px 20px; /* 页面内边距 */
-  background-color: #f0f2f5; /* 背景颜色 */
-}
-
-.detail-card {
-  max-width: 1000px; /* 卡片最大宽度 */
-  width: 100%; /* 卡片宽度自适应 */
-  padding: 20px; /* 卡片内边距 */
-  border-radius: 10px; /* 圆角 */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-  background-color: #ffffff; /* 卡片背景色 */
+  flex-direction: column;
+  padding: 40px 50px;
+  background-color: #f0f2f5;
+  width: 100vw;
+  box-sizing: border-box;
 }
 
 .image-section {
-  display: flex; 
-  justify-content: center; /* 图片居中对齐 */
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
 .item-image {
-  max-width: 100%; /* 图片最大宽度 */
-  border-radius: 10px; /* 圆角 */
-  margin-bottom: 20px; /* 图片与下方内容间距 */
-  object-fit: cover; /* 图片按比例缩放 */
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .info-section {
   display: flex;
-  flex-direction: column; /* 垂直排列 */
+  flex-direction: column;
   justify-content: center;
 }
 
-.info-wrapper {
-  padding: 10px 20px; /* 内边距 */
-}
-
 .item-title {
-  font-size: 2.2rem; /* 标题字体大小 */
-  color: #2c3e50; /* 标题颜色 */
-  margin-bottom: 10px; /* 标题底部间距 */
-  font-weight: bold; /* 加粗 */
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.item-price,
-.item-current-bid {
-  font-size: 1.5rem; /* 价格字体大小 */
-  color: #e74c3c; /* 价格颜色 */
-  margin-bottom: 10px; /* 与描述的间距 */
+.item-price {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.item-condition {
+  font-size: 1rem;
+  margin-bottom: 20px;
 }
 
 .item-description {
-  font-size: 1.1rem; /* 描述字体大小 */
-  color: #7f8c8d; /* 描述颜色 */
-  margin-bottom: 20px; /* 描述与竞价区的间距 */
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-top: 20px;
 }
 
-.bid-section {
-  display: flex; /* 使用 Flex 布局 */
-  gap: 10px; /* 输入框和按钮之间的间距 */
-  margin-top: 20px; /* 与上方内容间距 */
+.quantity-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.bid-input {
-  width: 180px; /* 输入框宽度 */
+.stock-info {
+  margin-left: 10px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
 }
 
-.bid-button {
-  padding: 10px 20px; /* 按钮内边距 */
-  transition: background-color 0.3s ease; /* 背景色过渡效果 */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* 保证按钮宽度一致 */
+  gap: 10px;
 }
 
-.bid-button:hover {
-  background-color: #3498db; /* 按钮悬停时的背景颜色 */
+.bid-now-button {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  background-color: #0066c0;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.bid-now-button:hover {
+  background-color: #00509d;
+}
+
+.add-to-cart-button {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  background-color: white;
+  color: #0066c0;
+  border: 1px solid #0066c0;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+  background-color: #f5f5f5;
+  color: #00509d;
+}
+
+.add-to-watchlist-button {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  background-color: white;
+  color: #0066c0;
+  border: 1px solid #0066c0;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.add-to-watchlist-button:hover {
+  background-color: #f5f5f5;
+  color: #00509d;
 }
 
 .bid-history {
-  margin-top: 30px; /* 出价历史与其他内容的间距 */
-  border-radius: 10px; /* 表格圆角 */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 表格阴影 */
+  margin-top: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.el-button + .el-button {
+  margin-left: 0;
+}
+
+/* 新增的商品详细信息样式 */
+.product-details-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.product-details {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.product-details h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.product-details p {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* 聊天按钮样式 */
+.chat-button {
+  flex-shrink: 0;
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  background-color: #ff9900;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #e68a00;
 }
 </style>

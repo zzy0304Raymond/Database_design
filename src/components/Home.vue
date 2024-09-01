@@ -98,11 +98,19 @@ export default {
         { id: 10, name: 'Tablet', startingBid: 1000, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
         { id: 11, name: 'Emerald Bracelet', startingBid: 1100, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
         { id: 12, name: 'Antique Chair', startingBid: 1200, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
+        { id: 13, name: 'Silver Watch', startingBid: 1300, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
+        { id: 14, name: 'Porcelain Set', startingBid: 1400, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
+        { id: 15, name: 'Modern Sculpture', startingBid: 1500, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
+        { id: 16, name: 'Digital Camera', startingBid: 1600, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
+        { id: 17, name: 'Bronze Statue', startingBid: 1700, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
+        { id: 18, name: 'Pearl Necklace', startingBid: 1800, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
+        { id: 19, name: 'Antique Mirror', startingBid: 1900, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
+        { id: 20, name: 'Emerald Necklace', startingBid: 2000, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
       ],
       searchQuery: '',
       selectedCategory: '',
       currentPage: 1,
-      itemsPerPage: 3,
+      itemsPerPage: 6,
       searchResults: [],
       discountItems: [
         { id: 1, title: 'Discount Item 1', price: '¥50', image: '/path_to_uploaded_image/image.png' },
@@ -203,7 +211,7 @@ export default {
   width: 100%;
   display: flex; /* 使用 Flex 布局 */
   flex-wrap: wrap; /* 换行显示 */
-  justify-content: center; /* 居中对齐 */
+  justify-content: flex-start; /* 居中对齐 */
 }
 
 .auction-item {
@@ -255,8 +263,9 @@ export default {
   text-align: center;
   padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 10px;
+  width: 100%; /* 占满页面宽度 */
   margin: 20px 0;
+  box-sizing: border-box; /* 包含 padding 在内的宽度 */
 }
 
 </style>
