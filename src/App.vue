@@ -19,6 +19,9 @@
       <el-menu-item index="6">
         <router-link to="/admin">Admin</router-link>
       </el-menu-item>
+      <el-menu-item index="7">
+        <router-link to="/manual">UserManual</router-link>
+      </el-menu-item>
     </el-menu>
     <router-view></router-view>
   </div>

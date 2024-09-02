@@ -9,6 +9,7 @@ import AdminLogin from '../components/AdminLogin.vue';
 import Inbox from '../components/Inbox.vue';
 import Chat from '../components/Chat.vue';  // 导入 Chat 组件
 import Payment from '../components/Payment.vue';
+import UserManual from '../components/UserManual.vue'; // 导入 UserManual 组件
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -36,6 +37,7 @@ const routes = [
     component: Payment,
     props: true, // 确保参数通过 props 传递到组件
   },
+  { path: '/manual', name: 'UserManual', component: UserManual }, // 添加使用手册的路由
 ];
 
 

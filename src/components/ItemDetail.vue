@@ -60,6 +60,20 @@
         <el-button type="primary" @click="sendMessage">Send</el-button>
       </span>
     </el-dialog>
+
+    <div class="recommendations-section">
+      <h2>猜你喜欢</h2>
+      <el-row :gutter="20">
+        <el-col :span="6" v-for="recommendation in recommendedItems" :key="recommendation.id">
+          <el-card class="recommendation-item" shadow="hover">
+            <img :src="recommendation.imageUrl" alt="recommendation.name" class="recommendation-image" />
+            <h3>{{ recommendation.name }}</h3>
+            <p>Starting Bid: ${{ recommendation.startingBid }}</p>
+            <el-button type="primary" @click="viewItem(recommendation.id)">View Details</el-button>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
     
   </div>
 </template>
@@ -80,6 +94,7 @@ export default {
         condition: '',
         details: '',
         stock: 1,
+        recommendedItems: [],
       },
       quantity: 1,
       bidAmount: 0, // 用户输入的出价金额
@@ -109,6 +124,19 @@ export default {
         .catch(error => {
           console.error('Error fetching item details:', error);
         });
+    },
+    fetchRecommendations() {
+      const category = this.item.category;
+      axios.get(`http://your-api-endpoint/auction-items/recommendations?category=${category}`)
+        .then(response => {
+          this.recommendedItems = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching recommendations:', error);
+        });
+    },
+    viewItem(id) {
+      this.$router.push({ name: 'ItemDetail', params: { id } });
     },
     fetchBidHistory() {
       const itemId = this.$route.params.id;
@@ -314,5 +342,26 @@ export default {
 
 .chat-button:hover {
   background-color: #e68a00;
+}
+
+/* 新增的“猜你喜欢”样式 */
+.recommendations-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.recommendation-item {
+  text-align: center;
+  padding: 10px;
+}
+
+.recommendation-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 </style>
