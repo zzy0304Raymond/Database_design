@@ -42,28 +42,47 @@ export default {
     };
   },
   methods: {
-    // 登录方法，处理用户登录逻辑
-    login() {
-      // 发送 POST 请求到登录 API，提交用户的邮箱和密码
-      axios.post('http://your-api-endpoint/login', {
-        email: this.form.email, // 提交的邮箱
-        password: this.form.password, // 提交的密码
-      })
-      .then(response => {
-        console.log('Login successful:', response.data); // 打印登录成功的响应数据
-        // 处理登录成功后的逻辑，比如保存用户信息到本地存储或状态管理
-        localStorage.setItem('authToken', token); // 保存 token
-        localStorage.setItem('userId', user.id); // 保存用户 ID
-        this.$router.push({ name: 'Home' }); // 登录成功后跳转到首页
-      })
-      .catch(error => {
-        console.error('Error logging in:', error); // 打印登录失败的错误信息
-        // 处理登录失败的逻辑，比如显示错误消息
-        this.$message.error('Login failed. Please check your credentials.');
-      })
-      .finally(() => {
-        this.isLoggingIn = false;
-      });
+    async login() {
+      // 防止重复提交
+      if (this.isLoggingIn) return;
+
+      this.isLoggingIn = true;
+
+      try {
+        // 发送 POST 请求到登录 API，提交用户的邮箱和密码
+        const response = await axios.post('http://your-api-endpoint/login', {
+          email: this.form.email,
+          password: this.form.password,
+        });
+
+        // 假设后端返回的响应中包含以下数据
+        const { token, user } = response.data;
+
+        // 将 token 和用户 ID 存储到本地存储中
+        localStorage.setItem('authToken', token); 
+        localStorage.setItem('userId', user.id);
+
+        // 可选：将用户信息存储到 Vuex 以便全局访问（假设你在使用 Vuex）
+        this.$store.commit('setUser', user);
+
+        // 登录成功后跳转到首页
+        this.$router.push({ name: 'Home' });
+
+        this.$message.success('Login successful!');
+
+      } catch (error) {
+        // 检查错误响应代码，显示相应的错误信息
+        if (error.response && error.response.status === 401) {
+          this.$message.error('Invalid credentials. Please try again.');
+        } else {
+          this.$message.error('An error occurred. Please try again later.');
+        }
+
+        console.error('Error logging in:', error);
+
+      } finally {
+        this.isLoggingIn = false; // 恢复按钮状态
+      }
     },
   },
 };

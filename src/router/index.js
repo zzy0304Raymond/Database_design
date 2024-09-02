@@ -10,6 +10,7 @@ import Inbox from '../components/Inbox.vue';
 import Chat from '../components/Chat.vue';  // 导入 Chat 组件
 import Payment from '../components/Payment.vue';
 import UserManual from '../components/UserManual.vue'; // 导入 UserManual 组件
+import SellItem from '../components/SellItem.vue'; // 导入 SellItem 组件
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -37,6 +38,7 @@ const routes = [
     component: Payment,
     props: true, // 确保参数通过 props 传递到组件
   },
+  { path: '/sell', name: 'SellItem', component: SellItem }, // 添加卖出商品的路由
   { path: '/manual', name: 'UserManual', component: UserManual }, // 添加使用手册的路由
 ];
 
@@ -47,29 +49,20 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      next();
-    } else {
-      next({ name: 'Login' });
-    }
-  } else {
-    next();
-  }
-});
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAdminAuth = to.matched.some(record => record.meta.requiresAdminAuth);
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    const adminToken = localStorage.getItem('adminToken');
-    if (adminToken) {
-      next();
-    } else {
-      next({ name: 'AdminLogin' });
-    }
-  } else {
-    next();
+  if (requiresAuth) {
+    const token = localStorage.getItem('authToken');
+    if (!token) return next({ name: 'Login' });
   }
+
+  if (requiresAdminAuth) {
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) return next({ name: 'AdminLogin' });
+  }
+
+  next();
 });
 
 export default router;

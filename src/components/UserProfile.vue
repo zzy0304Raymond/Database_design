@@ -91,6 +91,7 @@ export default {
       loading: true,
       editProfileDialog: false,
       isAuthenticated: false, // 增加身份验证状态
+      isSaving: false, // 增加保存状态标志
     };
   },
   created() {
@@ -100,36 +101,36 @@ export default {
       this.fetchUserData();
       this.fetchBiddingHistory();
     } else {
-      this.$router.push({ name: 'Login' });
+      this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } });
     }
   },
   methods: {
     // 获取用户数据
-    fetchUserData() {
-      const userId = localStorage.getItem('userId'); // 从本地存储获取用户 ID
-      axios.get(`http://your-api-endpoint/users/${userId}`) // 发送 GET 请求获取用户数据
-        .then(response => {
-          this.user = response.data; // 将响应数据赋值给 user
-          this.editForm = { ...response.data }; // 初始化编辑表单
-          this.loading = false; // 设置加载状态为 false
-        })
-        .catch(error => {
-          console.error('Error fetching user data:', error); // 打印错误信息
-          this.loading = false; // 设置加载状态为 false
-        });
+    async fetchUserData() {
+      const userId = localStorage.getItem('userId');
+      try {
+        const response = await axios.get(`http://your-api-endpoint/users/${userId}`);
+        this.user = response.data;
+        this.editForm = { ...response.data };
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        this.$message.error('Failed to load user data');
+      } finally {
+        this.loading = false;
+      }
     },
     // 获取竞价历史
-    fetchBiddingHistory() {
-      const userId = localStorage.getItem('userId'); // 从本地存储获取用户 ID
-      axios.get(`http://your-api-endpoint/users/${userId}/bids`) // 发送 GET 请求获取竞价历史
-        .then(response => {
-          this.bids = response.data; // 将响应数据赋值给 bids
-          this.loading = false; // 设置加载状态为 false
-        })
-        .catch(error => {
-          console.error('Error fetching bidding history:', error); // 打印错误信息
-          this.loading = false; // 设置加载状态为 false
-        });
+    async fetchBiddingHistory() {
+      const userId = localStorage.getItem('userId');
+      try {
+        const response = await axios.get(`http://your-api-endpoint/users/${userId}/bids`);
+        this.bids = response.data;
+      } catch (error) {
+        console.error('Error fetching bidding history:', error);
+        this.$message.error('Failed to load bidding history');
+      } finally {
+        this.loading = false;
+      }
     },
     // 打开编辑对话框
     openEditDialog() {
@@ -137,21 +138,22 @@ export default {
       this.editProfileDialog = true; // 设置编辑对话框显示状态为 true
     },
     // 保存编辑后的用户资料
-    saveProfile() {
-      const userId = localStorage.getItem('userId'); // 从本地存储获取用户 ID
-      axios.put(`http://your-api-endpoint/users/${userId}`, this.editForm) // 发送 PUT 请求保存编辑数据
-        .then(response => {
-          this.user = { ...this.editForm }; // 更新用户数据
-          this.editProfileDialog = false; // 关闭编辑对话框
-          this.$message({ // 显示成功提示
-            message: 'Profile updated successfully',
-            type: 'success'
-          });
-        })
-        .catch(error => {
-          console.error('Error updating profile:', error); // 打印错误信息
-          this.$message.error('Failed to update profile'); // 显示失败提示
-        });
+    async saveProfile() {
+      if (this.isSaving) return;
+      this.isSaving = true;
+
+      const userId = localStorage.getItem('userId');
+      try {
+        await axios.put(`http://your-api-endpoint/users/${userId}`, this.editForm);
+        this.user = { ...this.editForm };
+        this.editProfileDialog = false;
+        this.$message.success('Profile updated successfully');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        this.$message.error('Failed to update profile');
+      } finally {
+        this.isSaving = false;
+      }
     },
   },
 };

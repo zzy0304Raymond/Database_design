@@ -44,6 +44,7 @@
         currentUser: 'buyer1',
         sellerName: 'Seller',
         isTyping: false,
+        typingTimeout: null, // 用于打字通知的计时器
       };
     },
     created() {
@@ -52,8 +53,15 @@
       this.initializeSocket(senderId); // 初始化 WebSocket 连接
     },
     methods: {
-      fetchChatHistory(senderId) {
-        // 这里写获取聊天记录的逻辑
+      async fetchChatHistory(senderId) {
+        try {
+          const response = await axios.get(`http://your-api-endpoint/chats/${senderId}`);
+          this.messages = response.data;
+          this.scrollToBottom();
+        } catch (error) {
+          console.error('Error fetching chat history:', error);
+          this.$message.error('Failed to load chat history.');
+        }
       },
       initializeSocket(senderId) {
         this.socket = io('http://localhost:3000');
@@ -97,7 +105,11 @@
         return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       },
       notifyTyping() {
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
         this.socket.emit('typing');
+        this.typingTimeout = setTimeout(() => {
+          this.socket.emit('stopTyping');
+        }, 500);
       },
     },
     beforeDestroy() {

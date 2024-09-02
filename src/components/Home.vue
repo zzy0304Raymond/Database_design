@@ -81,42 +81,19 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'Home',
   data() {
     return {
-      auctionItems: [
-        { id: 1, name: 'Vintage Clock', startingBid: 100, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 2, name: 'Antique Vase', startingBid: 200, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 3, name: 'Rare Painting', startingBid: 300, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
-        { id: 4, name: 'Smartphone', startingBid: 400, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
-        { id: 5, name: 'Laptop', startingBid: 500, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
-        { id: 6, name: 'Diamond Ring', startingBid: 600, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-        { id: 7, name: 'Gold Necklace', startingBid: 700, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-        { id: 8, name: 'Antique Book', startingBid: 800, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 9, name: 'Oil Painting', startingBid: 900, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
-        { id: 10, name: 'Tablet', startingBid: 1000, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
-        { id: 11, name: 'Emerald Bracelet', startingBid: 1100, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-        { id: 12, name: 'Antique Chair', startingBid: 1200, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 13, name: 'Silver Watch', startingBid: 1300, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-        { id: 14, name: 'Porcelain Set', startingBid: 1400, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 15, name: 'Modern Sculpture', startingBid: 1500, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
-        { id: 16, name: 'Digital Camera', startingBid: 1600, imageUrl: 'https://via.placeholder.com/150', category: 'Electronics' },
-        { id: 17, name: 'Bronze Statue', startingBid: 1700, imageUrl: 'https://via.placeholder.com/150', category: 'Art' },
-        { id: 18, name: 'Pearl Necklace', startingBid: 1800, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-        { id: 19, name: 'Antique Mirror', startingBid: 1900, imageUrl: 'https://via.placeholder.com/150', category: 'Antiques' },
-        { id: 20, name: 'Emerald Necklace', startingBid: 2000, imageUrl: 'https://via.placeholder.com/150', category: 'Jewelry' },
-      ],
+      auctionItems: [],
       searchQuery: '',
       selectedCategory: '',
       currentPage: 1,
       itemsPerPage: 6,
       searchResults: [],
-      discountItems: [
-        { id: 1, title: 'Discount Item 1', price: '¥50', image: '/path_to_uploaded_image/image.png' },
-        { id: 2, title: 'Discount Item 2', price: '¥80', image: '/path_to_uploaded_image/image.png' },
-        { id: 3, title: 'Discount Item 3', price: '¥120', image: '/path_to_uploaded_image/image.png' },
-      ],
+      discountItems: [],
     };
   },
   computed: {
@@ -137,30 +114,60 @@ export default {
       return this.filteredItems.slice(start, end);
     },
   },
+
   methods: {
+    async fetchAuctionItems() {
+      try {
+        const response = await axios.get('/api/auction-items', {
+          params: {
+            page: this.currentPage,
+            perPage: this.itemsPerPage,
+            searchQuery: this.searchQuery,
+            category: this.selectedCategory,
+          }
+        });
+        this.auctionItems = response.data.items;
+      } catch (error) {
+        console.error('Error fetching auction items:', error);
+      }
+    },
+    async fetchDiscountItems() {
+      try {
+        const response = await axios.get('/api/discount-items');
+        this.discountItems = response.data.items;
+      } catch (error) {
+        console.error('Error fetching discount items:', error);
+      }
+    },
     viewItem(id) {
       this.$router.push({ name: 'ItemDetail', params: { id } });
     },
-    searchItems() {
-      if (this.searchQuery) {
-        this.searchResults = this.auctionItems.filter(item =>
-          item.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-      } else {
+    async searchItems() {
+      try {
+        const response = await axios.get('/api/search-items', {
+          params: { query: this.searchQuery }
+        });
+        this.searchResults = response.data.items;
+        this.currentPage = 1; // 重置分页
+      } catch (error) {
+        console.error('Error searching items:', error);
         this.searchResults = [];
       }
-      this.currentPage = 1;
     },
-    filterByCategory() {
-      // 处理分类筛选逻辑
+    async filterByCategory() {
+      await this.fetchAuctionItems();
     },
     handlePageChange(val) {
       this.currentPage = val;
+      this.fetchAuctionItems();
     },
     learnMore() {
-      // 跳转到品牌详情页
       this.$router.push('/brand');
     },
+  },
+  mounted() {
+    this.fetchAuctionItems();
+    this.fetchDiscountItems();
   },
 };
 </script>

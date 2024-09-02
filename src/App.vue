@@ -1,26 +1,8 @@
 <template>
   <div id="app">
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1">
-        <router-link to="/">Home</router-link>
-      </el-menu-item>
-      <el-menu-item index="2">
-        <router-link to="/login">Login</router-link>
-      </el-menu-item>
-      <el-menu-item index="3">
-        <router-link to="/register">Register</router-link>
-      </el-menu-item>
-      <el-menu-item index="4">
-        <router-link to="/profile">Profile</router-link>
-      </el-menu-item>
-      <el-menu-item index="5">
-        <router-link to="/inbox">Inbox</router-link>
-      </el-menu-item>
-      <el-menu-item index="6">
-        <router-link to="/admin">Admin</router-link>
-      </el-menu-item>
-      <el-menu-item index="7">
-        <router-link to="/manual">UserManual</router-link>
+      <el-menu-item v-for="item in menuItems" :key="item.index" :index="item.index">
+        <router-link :to="item.route">{{ item.name }}</router-link>
       </el-menu-item>
     </el-menu>
     <router-view></router-view>
@@ -33,12 +15,25 @@ export default {
   data() {
     return {
       activeIndex: '1',
+      menuItems: [
+        { index: '1', name: 'Home', route: '/' },
+        { index: '2', name: 'Login', route: '/login' },
+        { index: '3', name: 'Register', route: '/register' },
+        { index: '4', name: 'Profile', route: '/profile' },
+        { index: '5', name: 'Inbox', route: '/inbox' },
+        { index: '6', name: 'Admin', route: '/admin' },
+        { index: '7', name: 'UserManual', route: '/manual' },
+        { index: '8', name: 'SellItem', route: '/sell' },
+      ],
     };
   },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
+  },
+  created() {
+    this.activeIndex = this.menuItems.find(item => item.route === this.$route.path)?.index || '1';
   },
 };
 </script>

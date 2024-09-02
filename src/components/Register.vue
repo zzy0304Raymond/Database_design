@@ -33,40 +33,47 @@ export default {
   name: 'Register',
   data() {
     return {
-      // 定义表单数据对象，包含用户名、邮箱和密码
       form: {
         username: '',
         email: '',
         password: '',
       },
+      isSubmitting: false, // 增加加载状态标志
     };
   },
   methods: {
-    // 表单提交方法，首先验证表单的完整性
     submitForm() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          // 验证通过后调用 register 方法进行注册请求
           this.register();
         } else {
-          // 验证不通过时打印错误信息
           console.log('error submit!!');
           return false;
         }
       });
     },
-    // 注册方法，通过 axios 发送 POST 请求
-    register() {
-      axios.post('http://your-api-endpoint/register', this.form)
-        .then(response => {
-          // 注册成功后打印返回信息，并跳转到登录页面
-          console.log('Registration successful:', response.data);
-          this.$router.push({ name: 'Login' });
-        })
-        .catch(error => {
-          // 注册失败时打印错误信息
-          console.error('Error registering:', error);
-        });
+    async register() {
+      if (this.isSubmitting) return; // 防止重复提交
+      this.isSubmitting = true;
+
+      try {
+        const response = await axios.post('http://your-api-endpoint/register', this.form);
+
+        console.log('Registration successful:', response.data);
+        this.$message.success('Registration successful! Please log in.');
+        this.$router.push({ name: 'Login' });
+
+      } catch (error) {
+        console.error('Error registering:', error);
+        if (error.response && error.response.status === 400) {
+          this.$message.error('Registration failed. Please check your input.');
+        } else {
+          this.$message.error('An error occurred. Please try again later.');
+        }
+
+      } finally {
+        this.isSubmitting = false;
+      }
     },
   },
 };

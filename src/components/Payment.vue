@@ -60,13 +60,39 @@
       };
     },
     methods: {
-      processPayment() {
-        // 处理支付逻辑，例如向服务器发送支付请求
-        console.log('Processing payment with method:', this.paymentForm.paymentMethod);
-        console.log('Payment details:', this.order);
-        this.$message.success('Payment processed successfully!');
-        // 支付成功后可以重定向到订单确认页面或其他相关页面
-        this.$router.push('/order-confirmation');
+      async processPayment() {
+        // 防止重复提交
+        if (this.isProcessing) return;
+        this.isProcessing = true;
+
+        try {
+          // 假设后端需要支付方式和订单信息
+          const paymentData = {
+            itemName: this.order.itemName,
+            quantity: this.order.quantity,
+            totalAmount: this.order.totalAmount,
+            paymentMethod: this.paymentForm.paymentMethod,
+            cardNumber: this.paymentForm.cardNumber,
+          };
+
+          // 向服务器发送支付请求
+          const response = await axios.post('http://your-api-endpoint/payment', paymentData);
+
+          // 如果支付成功，展示成功信息并跳转
+          if (response.data.success) {
+            this.$message.success('Payment processed successfully!');
+            this.$router.push('/order-confirmation');
+          } else {
+            this.$message.error('Payment failed. Please try again.');
+          }
+
+        } catch (error) {
+          console.error('Error processing payment:', error);
+          this.$message.error('An error occurred during payment. Please try again later.');
+        } finally {
+          this.isProcessing = false; // 恢复提交状态
+          this.paymentForm.cardNumber = ''; // 清除信用卡号等敏感信息
+        }
       },
     },
   };

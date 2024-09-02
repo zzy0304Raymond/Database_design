@@ -97,9 +97,14 @@ export default {
         recommendedItems: [],
       },
       quantity: 1,
-      bidAmount: 0, // 用户输入的出价金额
-      bidIncrement: 5, // 出价步长，最小加价金额
+      bidAmount: 0,
+      bidIncrement: 5,
       bids: [],
+      recommendedItems: [],
+      chatVisible: false,
+      chatMessage: '',
+      isLoading: true,
+      error: null,
     };
   },
   computed: {
