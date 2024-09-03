@@ -4,19 +4,24 @@
     <div class="add-item">
       <h2>Add New Item</h2>
       <el-form @submit.prevent="addItem" :model="newItem" ref="newItemForm">
-        <el-form-item label="Name" :rules="[{ required: true, message: 'Please input the item name', trigger: 'blur' }]">
+        <el-form-item label="Name"
+          :rules="[{ required: true, message: 'Please input the item name', trigger: 'blur' }]">
           <el-input v-model="newItem.name"></el-input>
         </el-form-item>
-        <el-form-item label="Starting Bid" :rules="[{ required: true, message: 'Please input the starting bid', trigger: 'blur' }]">
+        <el-form-item label="Starting Bid"
+          :rules="[{ required: true, message: 'Please input the starting bid', trigger: 'blur' }]">
           <el-input type="number" v-model="newItem.startingBid"></el-input>
         </el-form-item>
-        <el-form-item label="Category" :rules="[{ required: true, message: 'Please input the category', trigger: 'blur' }]">
+        <el-form-item label="Category"
+          :rules="[{ required: true, message: 'Please input the category', trigger: 'blur' }]">
           <el-input v-model="newItem.category"></el-input>
         </el-form-item>
-        <el-form-item label="End Time" :rules="[{ required: true, message: 'Please select the end time', trigger: 'change' }]">
+        <el-form-item label="End Time"
+          :rules="[{ required: true, message: 'Please select the end time', trigger: 'change' }]">
           <el-date-picker v-model="newItem.endTime" type="datetime" placeholder="Select date and time"></el-date-picker>
         </el-form-item>
-        <el-form-item label="Image URL" :rules="[{ required: true, message: 'Please input the image URL', trigger: 'blur' }]">
+        <el-form-item label="Image URL"
+          :rules="[{ required: true, message: 'Please input the image URL', trigger: 'blur' }]">
           <el-input v-model="newItem.imageUrl"></el-input>
         </el-form-item>
         <el-form-item>
@@ -40,19 +45,25 @@
     </div>
     <el-dialog v-if="editingItem" title="Edit Item" :visible.sync="editItemDialogVisible">
       <el-form :model="editingItem" ref="editItemForm">
-        <el-form-item label="Name" :rules="[{ required: true, message: 'Please input the item name', trigger: 'blur' }]">
+        <el-form-item label="Name"
+          :rules="[{ required: true, message: 'Please input the item name', trigger: 'blur' }]">
           <el-input v-model="editingItem.name"></el-input>
         </el-form-item>
-        <el-form-item label="Starting Bid" :rules="[{ required: true, message: 'Please input the starting bid', trigger: 'blur' }]">
+        <el-form-item label="Starting Bid"
+          :rules="[{ required: true, message: 'Please input the starting bid', trigger: 'blur' }]">
           <el-input type="number" v-model="editingItem.startingBid"></el-input>
         </el-form-item>
-        <el-form-item label="Category" :rules="[{ required: true, message: 'Please input the category', trigger: 'blur' }]">
+        <el-form-item label="Category"
+          :rules="[{ required: true, message: 'Please input the category', trigger: 'blur' }]">
           <el-input v-model="editingItem.category"></el-input>
         </el-form-item>
-        <el-form-item label="End Time" :rules="[{ required: true, message: 'Please select the end time', trigger: 'change' }]">
-          <el-date-picker v-model="editingItem.endTime" type="datetime" placeholder="Select date and time"></el-date-picker>
+        <el-form-item label="End Time"
+          :rules="[{ required: true, message: 'Please select the end time', trigger: 'change' }]">
+          <el-date-picker v-model="editingItem.endTime" type="datetime"
+            placeholder="Select date and time"></el-date-picker>
         </el-form-item>
-        <el-form-item label="Image URL" :rules="[{ required: true, message: 'Please input the image URL', trigger: 'blur' }]">
+        <el-form-item label="Image URL"
+          :rules="[{ required: true, message: 'Please input the image URL', trigger: 'blur' }]">
           <el-input v-model="editingItem.imageUrl"></el-input>
         </el-form-item>
         <el-form-item>
@@ -65,6 +76,8 @@
 
 <script>
 import axios from 'axios';
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
   name: 'Admin',
@@ -89,7 +102,7 @@ export default {
   },
   methods: {
     fetchAuctionItems() {
-      axios.get('http://your-api-endpoint/auction-items')
+      axios.get(`${BACKEND_BASE_URL}/auction-items`)
         .then(response => {
           this.auctionItems = response.data;
         })
@@ -110,7 +123,7 @@ export default {
     },
     addItem() {
       this.isAddingItem = true;
-      axios.post('http://your-api-endpoint/auction-items', this.newItem)
+      axios.post(`${BACKEND_BASE_URL}/auction-items`, this.newItem)
         .then(response => {
           this.auctionItems.push(response.data);
           this.resetNewItemForm();
@@ -143,7 +156,7 @@ export default {
     },
     updateItem() {
       this.isUpdatingItem = true;
-      axios.put(`http://your-api-endpoint/auction-items/${this.editingItem.id}`, this.editingItem)
+      axios.put(`${BACKEND_BASE_URL}/auction-items/${this.editingItem.id}`, this.editingItem)
         .then(response => {
           const index = this.auctionItems.findIndex(item => item.id === this.editingItem.id);
           this.$set(this.auctionItems, index, response.data);
@@ -159,7 +172,7 @@ export default {
         });
     },
     deleteItem(id) {
-      axios.delete(`http://your-api-endpoint/auction-items/${id}`)
+      axios.delete(`${BACKEND_BASE_URL}/auction-items/${id}`)
         .then(response => {
           const index = this.auctionItems.findIndex(item => item.id === id);
           this.auctionItems.splice(index, 1);
@@ -177,6 +190,7 @@ export default {
 .admin {
   padding: 20px;
 }
+
 .add-item,
 .item-list {
   margin-bottom: 20px;

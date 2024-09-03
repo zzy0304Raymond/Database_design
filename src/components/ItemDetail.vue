@@ -36,7 +36,7 @@
       <el-table-column prop="amount" label="Bid Amount" width="150"></el-table-column>
       <el-table-column prop="time" label="Time"></el-table-column>
     </el-table>
-    
+
     <!-- 商品详细信息 -->
     <div class="product-details-container">
       <div class="product-details">
@@ -49,12 +49,8 @@
 
     <!-- 聊天窗口 -->
     <el-dialog title="Chat with Seller" :visible.sync="chatVisible" width="50%">
-      <el-input
-        type="textarea"
-        v-model="chatMessage"
-        placeholder="Type your message here..."
-        class="chat-input"
-      ></el-input>
+      <el-input type="textarea" v-model="chatMessage" placeholder="Type your message here..."
+        class="chat-input"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="chatVisible = false">Cancel</el-button>
         <el-button type="primary" @click="sendMessage">Send</el-button>
@@ -74,12 +70,14 @@
         </el-col>
       </el-row>
     </div>
-    
+
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
   name: 'ItemDetail',
@@ -121,7 +119,7 @@ export default {
   methods: {
     fetchItemDetails() {
       const itemId = this.$route.params.id;
-      axios.get(`http://your-api-endpoint/auction-items/${itemId}`)
+      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}`)
         .then(response => {
           this.item = response.data;
           this.bidAmount = this.minimumNextBid; // 设置默认出价为最小下一次出价
@@ -132,7 +130,7 @@ export default {
     },
     fetchRecommendations() {
       const category = this.item.category;
-      axios.get(`http://your-api-endpoint/auction-items/recommendations?category=${category}`)
+      axios.get(`${BACKEND_BASE_URL}/auction-items/recommendations?category=${category}`)
         .then(response => {
           this.recommendedItems = response.data;
         })
@@ -145,7 +143,7 @@ export default {
     },
     fetchBidHistory() {
       const itemId = this.$route.params.id;
-      axios.get(`http://your-api-endpoint/auction-items/${itemId}/bids`)
+      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}/bids`)
         .then(response => {
           this.bids = response.data;
         })
@@ -154,20 +152,20 @@ export default {
         });
     },
     bidNow() {
-    if (this.bidAmount < this.minimumNextBid) {
-      this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
-      return;
-    }
-    // 传递出价金额和数量到支付页面
-    this.$router.push({
-      name: 'Payment',
-      params: {
-        itemName: this.item.name,
-        amount: this.bidAmount,
-        quantity: this.quantity
+      if (this.bidAmount < this.minimumNextBid) {
+        this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
+        return;
       }
-    });
-  },
+      // 传递出价金额和数量到支付页面
+      this.$router.push({
+        name: 'Payment',
+        params: {
+          itemName: this.item.name,
+          amount: this.bidAmount,
+          quantity: this.quantity
+        }
+      });
+    },
     // 添加到购物车
     addToCart() {
       // 实现添加到购物车的逻辑
@@ -251,7 +249,8 @@ export default {
 .button-group {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* 保证按钮宽度一致 */
+  align-items: stretch;
+  /* 保证按钮宽度一致 */
   gap: 10px;
 }
 
@@ -307,7 +306,7 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.el-button + .el-button {
+.el-button+.el-button {
   margin-left: 0;
 }
 
