@@ -4,6 +4,8 @@ using auctionapp.Models;
 
 namespace auctionapp.Controllers
 {
+
+
     [Route("api/auction-items")]
     [ApiController]
     public class AuctionItemsController : ControllerBase
@@ -14,6 +16,64 @@ namespace auctionapp.Controllers
         {
             _context = context;
         }
+
+        //GET: api/auction-items/{itemId} 获取物品详细
+
+        [HttpGet("{itemId}")]
+        public async Task<IActionResult> GetAuctionItem(string itemId)
+        {
+            try
+            {
+                // 从数据库中获取拍卖物品的详细信息
+                var item = await _context.Items
+                    .Include(item => item.Auctions) // 包含拍卖信息
+                    .Include(item => item.Feedbackpublishes) // 包含反馈发布信息
+                    .Include(item => item.Users) // 包含用户信息
+                    .FirstOrDefaultAsync(item => item.Itemid == itemId);
+
+                if (item == null)
+                {
+                    // 如果没有找到物品，返回404状态码
+                    return NotFound($"Item with ID {itemId} not found.");
+                }
+
+                // 将拍卖物品的详细信息转换为JSON格式
+                var itemDetails = new
+                {
+                    id = item.Itemid,
+                    images = item.Image != null ? Convert.ToBase64String(item.Image) : null, // 假设需要将图片转换为Base64字符串
+                    name = item.Itemname,
+                    currentBid = item.Auctions.Any() ? item.Auctions.Max(a => a.Currenthighestbid) : (decimal?)null, // 获取当前最高出价
+                    startingBid = item.Startingprice,
+                    description = item.Description,
+                    condition = "New", // 
+                    details = item.Feedbackpublishes.FirstOrDefault().Feedback.Content,
+                    stock = item.Users.Count, //
+                    category = "General", // 
+                    recommendedItems = item.Auctions.Select(a => new
+                    {
+                        auctionId = a.Auctionid,
+                        name = item.Itemname,
+                        images = item.Image != null ? Convert.ToBase64String(item.Image) : null,
+                        currentBid = a.Currenthighestbid,
+                        startingBid = item.Startingprice,
+                        description = item.Description,
+                        condition = "New",
+                        details = " ",
+                        stock = item.Users.Count
+                    })
+                };
+
+                // 返回200状态码和拍卖物品的详细信息
+                return Ok(itemDetails);
+            }
+            catch (Exception ex)
+            {
+                // 如果发生异常，返回500状态码和错误信息
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
 
         // GET: api/auction-items
         [HttpGet]
@@ -146,6 +206,69 @@ namespace auctionapp.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the auction item." });
+            }
+        }
+
+        //获取推荐物品列表
+        [HttpGet("recommendations")]
+        public async Task<IActionResult> GetRecommendedItems(string category)
+        {
+            if (string.IsNullOrEmpty(category))
+            {
+                return BadRequest("Category parameter is required.");
+            }
+
+            try
+            {
+                var recommendedItems = await _context.Items
+                    .Where(item => item.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+                    .Select(item => new
+                    {
+                        id = item.Itemid,
+                        name = item.Itemname,
+                        currentBid = item.Auctions.Any() ? item.Auctions.Max(a => a.Currenthighestbid) : (decimal?)null,
+                        startingBid = item.Startingprice,
+                        description = item.Description,
+                        imageUrl = item.Image != null ? Convert.ToBase64String(item.Image) : null
+                    })
+                    .ToListAsync();
+
+                return Ok(recommendedItems);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
+        [HttpGet("{itemId}/bids")]
+        public async Task<IActionResult> GetBidHistory(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId))
+            {
+                return BadRequest("Item ID parameter is required.");
+            }
+
+            try
+            {
+                // 确保 itemId 与 Bidrecord 中的字段类型匹配，这里假设是 string 类型
+                var bidHistory = await _context.Bidrecords.
+                    .Where(record => record.Itemid == itemId)
+                    .Select(record => new
+                    {
+                        id = record.Id,
+                        bidderId = record.BidderId,
+                        amount = record.Amount,
+                        timestamp = record.Timestamp.ToString("o") // ISO 8601 格式
+                    })
+                    .ToListAsync();
+
+                return Ok(bidHistory);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
     }

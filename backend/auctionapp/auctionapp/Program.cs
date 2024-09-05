@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AuctionDbContext>(options =>
     options.UseOracle(connectionString,
     oracleOptions => oracleOptions.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion21)));
 
+
 // 添加其他服务（如控制器、Swagger等）
 builder.Services.AddControllers();
 
