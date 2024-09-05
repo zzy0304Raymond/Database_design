@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using auctionapp.Models;
 
+
 namespace auctionapp.Controllers
 {
 
@@ -210,42 +211,42 @@ namespace auctionapp.Controllers
         }
 
         //获取推荐物品列表
-        [HttpGet("recommendations")]
-        public async Task<IActionResult> GetRecommendedItems(string category)
+        //[HttpGet("recommendations")]
+        //public async Task<IActionResult> GetRecommendedItems(string category)
+        //{
+        //    if (string.IsNullOrEmpty(category))
+        //    {
+        //        return BadRequest("Category parameter is required.");
+        //    }
+
+        //    try
+        //    {
+        //        var recommendedItems = await _context.Items
+        //            .Where(item => item.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+        //            .Select(item => new
+        //            {
+        //                id = item.Itemid,
+        //                name = item.Itemname,
+        //                currentBid = item.Auctions.Any() ? item.Auctions.Max(a => a.Currenthighestbid) : (decimal?)null,
+        //                startingBid = item.Startingprice,
+        //                description = item.Description,
+        //                imageUrl = item.Image != null ? Convert.ToBase64String(item.Image) : null
+        //            })
+        //            .ToListAsync();
+
+        //        return Ok(recommendedItems);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred: {ex.Message}");
+        //    }
+        //}
+
+
+        [HttpGet("{Bidid}/bids")]
+        public async Task<IActionResult> GetBidHistory(string bidId)
         {
-            if (string.IsNullOrEmpty(category))
-            {
-                return BadRequest("Category parameter is required.");
-            }
-
-            try
-            {
-                var recommendedItems = await _context.Items
-                    .Where(item => item.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
-                    .Select(item => new
-                    {
-                        id = item.Itemid,
-                        name = item.Itemname,
-                        currentBid = item.Auctions.Any() ? item.Auctions.Max(a => a.Currenthighestbid) : (decimal?)null,
-                        startingBid = item.Startingprice,
-                        description = item.Description,
-                        imageUrl = item.Image != null ? Convert.ToBase64String(item.Image) : null
-                    })
-                    .ToListAsync();
-
-                return Ok(recommendedItems);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-
-
-        [HttpGet("{itemId}/bids")]
-        public async Task<IActionResult> GetBidHistory(string itemId)
-        {
-            if (string.IsNullOrEmpty(itemId))
+            if (string.IsNullOrEmpty(bidId))
             {
                 return BadRequest("Item ID parameter is required.");
             }
@@ -253,14 +254,14 @@ namespace auctionapp.Controllers
             try
             {
                 // 确保 itemId 与 Bidrecord 中的字段类型匹配，这里假设是 string 类型
-                var bidHistory = await _context.Bidrecords.
-                    .Where(record => record.Itemid == itemId)
+                var bidHistory = await _context.Bidrecords
+                    .Where(record => record.Bidid == bidId)
                     .Select(record => new
                     {
-                        id = record.Id,
-                        bidderId = record.BidderId,
-                        amount = record.Amount,
-                        timestamp = record.Timestamp.ToString("o") // ISO 8601 格式
+                        id = record.Bidid,
+                        bidderId = record.Userid,
+                        amount = record.Bidamount,
+                        timestamp = record.Bidtime.Value.ToString("o") // ISO 8601 格式
                     })
                     .ToListAsync();
 
@@ -293,4 +294,7 @@ namespace auctionapp.Controllers
         public string PostTime { get; set; }
         public string ImageUrl { get; set; }
     }
+
+
+
 }
