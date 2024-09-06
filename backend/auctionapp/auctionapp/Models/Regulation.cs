@@ -5,11 +5,11 @@ namespace auctionapp.Models;
 
 public partial class Regulation
 {
-    public string Regulationid { get; set; } = null!;
+    public decimal Regulationid { get; set; }
 
-    public string? Transactionid { get; set; }
+    public decimal? Transactionid { get; set; }
 
-    public string? Adminid { get; set; }
+    public decimal? Adminid { get; set; }
 
     public DateTime? Regulationtime { get; set; }
 

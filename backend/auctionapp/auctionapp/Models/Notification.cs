@@ -5,7 +5,7 @@ namespace auctionapp.Models;
 
 public partial class Notification
 {
-    public string Notificationid { get; set; } = null!;
+    public decimal Notificationid { get; set; }
 
     public string? Content { get; set; }
 

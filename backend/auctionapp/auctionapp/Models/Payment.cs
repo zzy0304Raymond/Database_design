@@ -5,9 +5,9 @@ namespace auctionapp.Models;
 
 public partial class Payment
 {
-    public string Paymentid { get; set; } = null!;
+    public decimal Paymentid { get; set; }
 
-    public string? Transactionid { get; set; }
+    public decimal? Transactionid { get; set; }
 
     public decimal? Amount { get; set; }
 

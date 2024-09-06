@@ -5,7 +5,7 @@ namespace auctionapp.Models;
 
 public partial class Item
 {
-    public string Itemid { get; set; } = null!;
+    public decimal Itemid { get; set; }
 
     public string? Itemname { get; set; }
 
@@ -17,11 +17,7 @@ public partial class Item
 
     public byte[]? Image { get; set; }
 
-    public string? Category { get; set; }
-
     public virtual ICollection<Auction> Auctions { get; set; } = new List<Auction>();
-
-    public virtual ICollection<Bidrecord> Bidrecords { get; set; } = new List<Bidrecord>();
 
     public virtual ICollection<Feedbackpublish> Feedbackpublishes { get; set; } = new List<Feedbackpublish>();
 

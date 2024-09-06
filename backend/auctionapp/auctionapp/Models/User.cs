@@ -5,7 +5,7 @@ namespace auctionapp.Models;
 
 public partial class User
 {
-    public string Userid { get; set; } = null!;
+    public decimal Userid { get; set; }
 
     public string Username { get; set; } = null!;
 

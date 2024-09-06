@@ -5,9 +5,9 @@ namespace auctionapp.Models;
 
 public partial class Auction
 {
-    public string Auctionid { get; set; } = null!;
+    public decimal Auctionid { get; set; }
 
-    public string? Itemid { get; set; }
+    public decimal? Itemid { get; set; }
 
     public DateTime? Starttime { get; set; }
 
@@ -15,7 +15,7 @@ public partial class Auction
 
     public decimal? Currenthighestbid { get; set; }
 
-    public string? Currenthighestbiduserid { get; set; }
+    public decimal? Currenthighestbiduserid { get; set; }
 
     public virtual ICollection<Bidrecord> Bidrecords { get; set; } = new List<Bidrecord>();
 

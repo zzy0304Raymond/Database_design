@@ -5,7 +5,7 @@ namespace auctionapp.Models;
 
 public partial class Feedback
 {
-    public string Feedbackid { get; set; } = null!;
+    public decimal Feedbackid { get; set; }
 
     public string? Content { get; set; }
 

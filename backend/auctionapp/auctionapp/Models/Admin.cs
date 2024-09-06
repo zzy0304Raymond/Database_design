@@ -5,7 +5,7 @@ namespace auctionapp.Models;
 
 public partial class Admin
 {
-    public string Adminid { get; set; } = null!;
+    public decimal Adminid { get; set; }
 
     public decimal? Permissionlevel { get; set; }
 

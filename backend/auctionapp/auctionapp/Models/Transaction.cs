@@ -5,13 +5,13 @@ namespace auctionapp.Models;
 
 public partial class Transaction
 {
-    public string Transactionid { get; set; } = null!;
+    public decimal Transactionid { get; set; }
 
-    public string? Auctionid { get; set; }
+    public decimal? Auctionid { get; set; }
 
-    public string? Buyeruserid { get; set; }
+    public decimal? Buyeruserid { get; set; }
 
-    public string? Selleruserid { get; set; }
+    public decimal? Selleruserid { get; set; }
 
     public DateTime? Transactiontime { get; set; }
 

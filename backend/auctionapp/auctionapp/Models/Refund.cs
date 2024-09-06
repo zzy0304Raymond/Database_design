@@ -5,9 +5,9 @@ namespace auctionapp.Models;
 
 public partial class Refund
 {
-    public string Refundid { get; set; } = null!;
+    public decimal Refundid { get; set; }
 
-    public string? Transactionid { get; set; }
+    public decimal? Transactionid { get; set; }
 
     public decimal? Refundamount { get; set; }
 

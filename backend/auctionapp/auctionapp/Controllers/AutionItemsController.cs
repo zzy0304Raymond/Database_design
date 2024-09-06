@@ -21,7 +21,7 @@ namespace auctionapp.Controllers
         //GET: api/auction-items/{itemId} 获取物品详细
 
         [HttpGet("{itemId}")]
-        public async Task<IActionResult> GetAuctionItem(string itemId)
+        public async Task<IActionResult> GetAuctionItem(decimal itemId)
         {
             try
             {
@@ -115,7 +115,7 @@ namespace auctionapp.Controllers
             {
                 var item = new Item
                 {
-                    Itemid = "8",
+                    Itemid = 8,
                     Itemname = newItem.Name,
                     Description = "", // Adjust this if a description is needed
                     Startingprice = newItem.StartingBid,
@@ -244,9 +244,9 @@ namespace auctionapp.Controllers
 
 
         [HttpGet("{Bidid}/bids")]
-        public async Task<IActionResult> GetBidHistory(string bidId)
+        public async Task<IActionResult> GetBidHistory(decimal bidId)
         {
-            if (string.IsNullOrEmpty(bidId))
+            if (bidId <= 0)
             {
                 return BadRequest("Item ID parameter is required.");
             }
@@ -277,7 +277,7 @@ namespace auctionapp.Controllers
     // DTO class to match the API response format
     public class AuctionItemDto
     {
-        public string Id { get; set; }
+        public decimal Id { get; set; }
         public string Name { get; set; }
         public decimal StartingBid { get; set; }
         public string Category { get; set; }

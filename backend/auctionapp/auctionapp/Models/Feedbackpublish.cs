@@ -5,11 +5,11 @@ namespace auctionapp.Models;
 
 public partial class Feedbackpublish
 {
-    public string Feedbackid { get; set; } = null!;
+    public decimal Feedbackid { get; set; }
 
-    public string Userid { get; set; } = null!;
+    public decimal Userid { get; set; }
 
-    public string Itemid { get; set; } = null!;
+    public decimal Itemid { get; set; }
 
     public virtual Feedback Feedback { get; set; } = null!;
 

@@ -40,7 +40,8 @@ public partial class AuctionDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseOracle("Name=ConnectionStrings:DefaultConnection");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseOracle("User Id=auction_user;Password=tj1234567;Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=117.72.42.176)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=auction_pdb)))");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,13 +51,12 @@ public partial class AuctionDbContext : DbContext
 
         modelBuilder.Entity<Admin>(entity =>
         {
-            entity.HasKey(e => e.Adminid).HasName("SYS_C008224");
+            entity.HasKey(e => e.Adminid).HasName("SYS_C008265");
 
             entity.ToTable("ADMINS");
 
             entity.Property(e => e.Adminid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("ADMINID");
             entity.Property(e => e.Permissionlevel)
                 .HasColumnType("NUMBER")
@@ -68,121 +68,104 @@ public partial class AuctionDbContext : DbContext
                     r => r.HasOne<User>().WithMany()
                         .HasForeignKey("Userid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008255"),
+                        .HasConstraintName("SYS_C008295"),
                     l => l.HasOne<Admin>().WithMany()
                         .HasForeignKey("Adminid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008254"),
+                        .HasConstraintName("SYS_C008294"),
                     j =>
                     {
-                        j.HasKey("Adminid", "Userid").HasName("SYS_C008253");
+                        j.HasKey("Adminid", "Userid").HasName("SYS_C008293");
                         j.ToTable("ADMINMANAGEMENT");
-                        j.IndexerProperty<string>("Adminid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Adminid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("ADMINID");
-                        j.IndexerProperty<string>("Userid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Userid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("USERID");
                     });
         });
 
         modelBuilder.Entity<Auction>(entity =>
         {
-            entity.HasKey(e => e.Auctionid).HasName("SYS_C008226");
+            entity.HasKey(e => e.Auctionid).HasName("SYS_C008267");
 
             entity.ToTable("AUCTION");
 
             entity.Property(e => e.Auctionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("AUCTIONID");
             entity.Property(e => e.Currenthighestbid)
                 .HasColumnType("NUMBER(10,2)")
                 .HasColumnName("CURRENTHIGHESTBID");
             entity.Property(e => e.Currenthighestbiduserid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("CURRENTHIGHESTBIDUSERID");
             entity.Property(e => e.Endtime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("ENDTIME");
             entity.Property(e => e.Itemid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("ITEMID");
             entity.Property(e => e.Starttime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("STARTTIME");
 
             entity.HasOne(d => d.Currenthighestbiduser).WithMany(p => p.Auctions)
                 .HasForeignKey(d => d.Currenthighestbiduserid)
-                .HasConstraintName("SYS_C008228");
+                .HasConstraintName("SYS_C008269");
 
             entity.HasOne(d => d.Item).WithMany(p => p.Auctions)
                 .HasForeignKey(d => d.Itemid)
-                .HasConstraintName("SYS_C008227");
+                .HasConstraintName("SYS_C008268");
         });
 
         modelBuilder.Entity<Bidrecord>(entity =>
         {
-            entity.HasKey(e => e.Bidid).HasName("SYS_C008229");
+            entity.HasKey(e => e.Bidid).HasName("SYS_C008270");
 
             entity.ToTable("BIDRECORD");
 
             entity.Property(e => e.Bidid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("BIDID");
             entity.Property(e => e.Auctionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("AUCTIONID");
             entity.Property(e => e.Bidamount)
                 .HasColumnType("NUMBER(10,2)")
                 .HasColumnName("BIDAMOUNT");
             entity.Property(e => e.Bidtime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("BIDTIME");
-            entity.Property(e => e.Itemid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("ITEMID");
             entity.Property(e => e.Userid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("USERID");
 
             entity.HasOne(d => d.Auction).WithMany(p => p.Bidrecords)
                 .HasForeignKey(d => d.Auctionid)
-                .HasConstraintName("SYS_C008230");
-
-            entity.HasOne(d => d.Item).WithMany(p => p.Bidrecords)
-                .HasForeignKey(d => d.Itemid)
-                .HasConstraintName("FK");
+                .HasConstraintName("SYS_C008271");
 
             entity.HasOne(d => d.User).WithMany(p => p.Bidrecords)
                 .HasForeignKey(d => d.Userid)
-                .HasConstraintName("SYS_C008231");
+                .HasConstraintName("SYS_C008272");
         });
 
         modelBuilder.Entity<Feedback>(entity =>
         {
-            entity.HasKey(e => e.Feedbackid).HasName("SYS_C008243");
+            entity.HasKey(e => e.Feedbackid).HasName("SYS_C008284");
 
             entity.ToTable("FEEDBACK");
 
             entity.Property(e => e.Feedbackid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("FEEDBACKID");
             entity.Property(e => e.Content)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("CONTENT");
             entity.Property(e => e.Feedbacktime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("FEEDBACKTIME");
             entity.Property(e => e.Rating)
                 .HasMaxLength(2)
@@ -192,53 +175,45 @@ public partial class AuctionDbContext : DbContext
 
         modelBuilder.Entity<Feedbackpublish>(entity =>
         {
-            entity.HasKey(e => new { e.Feedbackid, e.Userid, e.Itemid }).HasName("SYS_C008244");
+            entity.HasKey(e => new { e.Feedbackid, e.Userid, e.Itemid }).HasName("SYS_C008285");
 
             entity.ToTable("FEEDBACKPUBLISH");
 
             entity.Property(e => e.Feedbackid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("FEEDBACKID");
             entity.Property(e => e.Userid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("USERID");
             entity.Property(e => e.Itemid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("ITEMID");
 
             entity.HasOne(d => d.Feedback).WithMany(p => p.Feedbackpublishes)
                 .HasForeignKey(d => d.Feedbackid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("SYS_C008245");
+                .HasConstraintName("SYS_C008286");
 
             entity.HasOne(d => d.Item).WithMany(p => p.Feedbackpublishes)
                 .HasForeignKey(d => d.Itemid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("SYS_C008247");
+                .HasConstraintName("SYS_C008288");
 
             entity.HasOne(d => d.User).WithMany(p => p.Feedbackpublishes)
                 .HasForeignKey(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("SYS_C008246");
+                .HasConstraintName("SYS_C008287");
         });
 
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("SYS_C008225");
+            entity.HasKey(e => e.Itemid).HasName("SYS_C008266");
 
             entity.ToTable("ITEM");
 
             entity.Property(e => e.Itemid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("ITEMID");
-            entity.Property(e => e.Category)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("CATEGORY");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -263,42 +238,39 @@ public partial class AuctionDbContext : DbContext
                     r => r.HasOne<User>().WithMany()
                         .HasForeignKey("Userid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008259"),
+                        .HasConstraintName("SYS_C008298"),
                     l => l.HasOne<Item>().WithMany()
                         .HasForeignKey("Itemid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008258"),
+                        .HasConstraintName("SYS_C008297"),
                     j =>
                     {
-                        j.HasKey("Itemid", "Userid").HasName("SYS_C008257");
+                        j.HasKey("Itemid", "Userid").HasName("SYS_C008296");
                         j.ToTable("ITEMPUBLISH");
-                        j.IndexerProperty<string>("Itemid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Itemid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("ITEMID");
-                        j.IndexerProperty<string>("Userid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Userid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("USERID");
                     });
         });
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.Notificationid).HasName("SYS_C008248");
+            entity.HasKey(e => e.Notificationid).HasName("SYS_C008261");
 
             entity.ToTable("NOTIFICATION");
 
             entity.Property(e => e.Notificationid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("NOTIFICATIONID");
             entity.Property(e => e.Content)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("CONTENT");
             entity.Property(e => e.Senttime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("SENTTIME");
             entity.Property(e => e.Status)
                 .HasMaxLength(2)
@@ -311,35 +283,32 @@ public partial class AuctionDbContext : DbContext
                     r => r.HasOne<User>().WithMany()
                         .HasForeignKey("Userid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008251"),
+                        .HasConstraintName("SYS_C008291"),
                     l => l.HasOne<Notification>().WithMany()
                         .HasForeignKey("Notificationid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("SYS_C008250"),
+                        .HasConstraintName("SYS_C008290"),
                     j =>
                     {
-                        j.HasKey("Notificationid", "Userid").HasName("SYS_C008249");
+                        j.HasKey("Notificationid", "Userid").HasName("SYS_C008289");
                         j.ToTable("SENDNOTIFICATION");
-                        j.IndexerProperty<string>("Notificationid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Notificationid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("NOTIFICATIONID");
-                        j.IndexerProperty<string>("Userid")
-                            .HasMaxLength(20)
-                            .IsUnicode(false)
+                        j.IndexerProperty<decimal>("Userid")
+                            .HasColumnType("NUMBER")
                             .HasColumnName("USERID");
                     });
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.Paymentid).HasName("SYS_C008239");
+            entity.HasKey(e => e.Paymentid).HasName("SYS_C008280");
 
             entity.ToTable("PAYMENT");
 
             entity.Property(e => e.Paymentid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("PAYMENTID");
             entity.Property(e => e.Amount)
                 .HasColumnType("NUMBER(10,2)")
@@ -349,27 +318,25 @@ public partial class AuctionDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("PAYMENTMETHOD");
             entity.Property(e => e.Paymenttime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("PAYMENTTIME");
             entity.Property(e => e.Transactionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("TRANSACTIONID");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.Transactionid)
-                .HasConstraintName("SYS_C008240");
+                .HasConstraintName("SYS_C008281");
         });
 
         modelBuilder.Entity<Refund>(entity =>
         {
-            entity.HasKey(e => e.Refundid).HasName("SYS_C008241");
+            entity.HasKey(e => e.Refundid).HasName("SYS_C008282");
 
             entity.ToTable("REFUND");
 
             entity.Property(e => e.Refundid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("REFUNDID");
             entity.Property(e => e.Refundamount)
                 .HasColumnType("NUMBER(10,2)")
@@ -379,108 +346,99 @@ public partial class AuctionDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("REFUNDREASON");
             entity.Property(e => e.Refundtime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("REFUNDTIME");
             entity.Property(e => e.Transactionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("TRANSACTIONID");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.Refunds)
                 .HasForeignKey(d => d.Transactionid)
-                .HasConstraintName("SYS_C008242");
+                .HasConstraintName("SYS_C008283");
         });
 
         modelBuilder.Entity<Regulation>(entity =>
         {
-            entity.HasKey(e => e.Regulationid).HasName("SYS_C008236");
+            entity.HasKey(e => e.Regulationid).HasName("SYS_C008277");
 
             entity.ToTable("REGULATION");
 
             entity.Property(e => e.Regulationid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("REGULATIONID");
             entity.Property(e => e.Adminid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("ADMINID");
             entity.Property(e => e.Content)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("CONTENT");
             entity.Property(e => e.Regulationtime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("REGULATIONTIME");
             entity.Property(e => e.Transactionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("TRANSACTIONID");
 
             entity.HasOne(d => d.Admin).WithMany(p => p.Regulations)
                 .HasForeignKey(d => d.Adminid)
-                .HasConstraintName("SYS_C008238");
+                .HasConstraintName("SYS_C008279");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.Regulations)
                 .HasForeignKey(d => d.Transactionid)
-                .HasConstraintName("SYS_C008237");
+                .HasConstraintName("SYS_C008278");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
         {
-            entity.HasKey(e => e.Transactionid).HasName("SYS_C008232");
+            entity.HasKey(e => e.Transactionid).HasName("SYS_C008273");
 
             entity.ToTable("TRANSACTION");
 
             entity.Property(e => e.Transactionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("TRANSACTIONID");
             entity.Property(e => e.Amount)
                 .HasColumnType("NUMBER(10,2)")
                 .HasColumnName("AMOUNT");
             entity.Property(e => e.Auctionid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("AUCTIONID");
             entity.Property(e => e.Buyeruserid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("BUYERUSERID");
             entity.Property(e => e.Selleruserid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("SELLERUSERID");
             entity.Property(e => e.Status)
                 .HasMaxLength(2)
                 .IsUnicode(false)
                 .HasColumnName("STATUS");
             entity.Property(e => e.Transactiontime)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("TRANSACTIONTIME");
 
             entity.HasOne(d => d.Auction).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.Auctionid)
-                .HasConstraintName("SYS_C008233");
+                .HasConstraintName("SYS_C008274");
 
             entity.HasOne(d => d.Buyeruser).WithMany(p => p.TransactionBuyerusers)
                 .HasForeignKey(d => d.Buyeruserid)
-                .HasConstraintName("SYS_C008234");
+                .HasConstraintName("SYS_C008275");
 
             entity.HasOne(d => d.Selleruser).WithMany(p => p.TransactionSellerusers)
                 .HasForeignKey(d => d.Selleruserid)
-                .HasConstraintName("SYS_C008235");
+                .HasConstraintName("SYS_C008276");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Userid).HasName("SYS_C008223");
+            entity.HasKey(e => e.Userid).HasName("SYS_C008264");
 
             entity.ToTable("USERS");
 
             entity.Property(e => e.Userid)
-                .HasMaxLength(20)
-                .IsUnicode(false)
+                .HasColumnType("NUMBER")
                 .HasColumnName("USERID");
             entity.Property(e => e.Address)
                 .HasMaxLength(100)
@@ -499,7 +457,7 @@ public partial class AuctionDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("PHONE");
             entity.Property(e => e.Registrationdate)
-                .HasPrecision(6)
+                .HasColumnType("DATE")
                 .HasColumnName("REGISTRATIONDATE");
             entity.Property(e => e.Username)
                 .HasMaxLength(20)
