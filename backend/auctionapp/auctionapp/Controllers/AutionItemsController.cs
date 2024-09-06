@@ -202,7 +202,6 @@ namespace auctionapp.Controllers
                 _context.Items.Remove(item);
                
                 await _context.SaveChangesAsync();
-                return BadRequest("test2" );
                 return Ok();
             }
             catch (Exception ex)

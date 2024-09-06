@@ -93,8 +93,10 @@ namespace auctionapp.Controllers
 
         //}
 
+
+        //获取用户资料
         [HttpGet("users/{userId}")]
-        public async Task<ActionResult<UserDetailsDto>> GetUser(string userId)
+        public async Task<ActionResult<UserDetailsDto>> GetUser(decimal userId)
         {
             if (!ModelState.IsValid)
             {
@@ -120,7 +122,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching User." });
+                return StatusCode(500, ex.Message);
             }
             //var user = await _context.Users.Include(u => u.Items).Include(u => u.Auctions).Include(u => u.Feedbackpublishes).Include(u => u.TransactionBuyerusers).Include(u => u.TransactionSellerusers).Include(u => u.Notifications).FirstOrDefaultAsync(u => u.Userid == userId);
             //if (user == null)
@@ -139,7 +141,7 @@ namespace auctionapp.Controllers
             //});
         }
 
-
+        //获取用户出价历史
         [HttpGet("users/{userId}/bids")]
         public async Task<ActionResult<IEnumerable<BidHistoryDto>>> GetUserBids(decimal userId)
         {
@@ -160,7 +162,7 @@ namespace auctionapp.Controllers
 
 
         [HttpPut("users/{userId}")]
-        public async Task<ActionResult<UserDto>> UpdateUser(string userId, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<ActionResult<UserDto>> UpdateUser(decimal userId, [FromBody] UpdateUserDto updateUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -193,7 +195,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the User" });
+                return StatusCode(500,ex.Message);
                 //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == userId);
                 //if (user == null)
                 //{
