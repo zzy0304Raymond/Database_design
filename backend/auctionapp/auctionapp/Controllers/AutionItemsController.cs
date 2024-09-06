@@ -88,7 +88,7 @@ namespace auctionapp.Controllers
                         Id = item.Itemid,
                         Name = item.Itemname,
                         StartingBid = item.Startingprice ?? 0,
-                        Category = item.Category, // Assuming no category column, adjust if necessary
+                        Category = "", // Assuming no category column, adjust if necessary
                         PostTime = item.Postdate.ToString(), // Adjust based on the actual data type
                         ImageUrl = item.Image != null ? $"data:image/png;base64,{Convert.ToBase64String(item.Image)}" : ""
                     })

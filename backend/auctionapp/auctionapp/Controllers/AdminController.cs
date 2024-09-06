@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using static auctionapp.Controllers.UserController;
+using System.Linq.Expressions;
 
 namespace auctionapp.Controllers
 {
@@ -23,23 +23,55 @@ namespace auctionapp.Controllers
 
         //POST :api/admin/login
         [HttpPost("login")]
-
-        public async Task<ActionResult<AdminLoginDto>> Login([FromBody] LoginDto loginDto)
+        public async Task<ActionResult<AdminLoginDto>>  Login([FromBody] LoginDto loginDto)
         {
-            var admin = await _context.Admins.Include(a => a.Users).FirstOrDefaultAsync(a => a.Users.Any(u => u.Email == loginDto.Email));
-            if (admin == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "No admin found with the provided email." });
+                return BadRequest(new { message = "Invalid input data." });
             }
-
-            var user = admin.Users.FirstOrDefault(u => u.Email == loginDto.Email);
-            if (user == null || !VerifyPassword(loginDto.Password, user.Password))
+            try
             {
-                return BadRequest(new { message = "Invalid credentials." });
-            }
+                var user = await _context.Users.FindAsync(loginDto.email);
+                if (user == null)
+                {
+                    return BadRequest(new { message = "Illegal email!" });
+                }
+                else if (user.Admins.Count == 0)
+                {
+                    return BadRequest(new { message = " Not Admin Permission!" });
+                }
+                else
+                {
+                    if (!VerifyPassword(loginDto.password, user.Password))
+                    {
+                        return BadRequest(new { message = "Incorrect Password!" });
+                    }
+                    else
+                    {
+                        var token = GenerateJwtToken(user);
+                        return Ok(new AdminLoginDto { token = token });
+                    }
+                }
 
-            var token = GenerateJwtToken(user);
-            return Ok(new AdminLoginDto { Token = token });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+                //var admin = await _context.Admins.Include(a => a.Users).FirstOrDefaultAsync(a => a.Users.Any(u => u.Email == loginDto.Email));
+                //if (admin == null)
+                //{
+                //    return BadRequest(new { message = "No admin found with the provided email." });
+                //}
+
+                //var user = admin.Users.FirstOrDefault(u => u.Email == loginDto.Email);
+                //if (user == null || !VerifyPassword(loginDto.Password, user.Password))
+                //{
+                //    return BadRequest(new { message = "Invalid credentials." });
+                //}
+
+                //var token = GenerateJwtToken(user);
+                //return Ok(new AdminLoginDto { Token = token });
         }
 
 
@@ -73,9 +105,14 @@ namespace auctionapp.Controllers
 
 
 
+public class LoginDto
+{
+    public string email { get; set; }
+    public string password { get; set; }
+}
 
 public class AdminLoginDto
 {
-    public string Token { get; set; }
+    public string token { get; set; }
 }
 
