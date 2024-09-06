@@ -49,8 +49,8 @@ namespace auctionapp.Controllers
                     }
                     else
                     {
-                        var token = GenerateJwtToken(user);
-                        return Ok(new AdminLoginDto { token = token });
+                        var adlogindto = new AdminLoginDto { message = "Login successfully" };
+                        return Ok(adlogindto);
                     }
                 }
 
@@ -81,23 +81,7 @@ namespace auctionapp.Controllers
             return password == storedPassword;
         }
 
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("j9b8v7x6u5t4s3r2n1m0k0l8j6f4d2b0a9s8d7c6v5b4n3m2"); // Replace with your actual secret key
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                new Claim(ClaimTypes.NameIdentifier, user.Userid.ToString("D")),
-                new Claim(ClaimTypes.Name, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddHours(2), // Token expiration time
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+        
 
 
     }
@@ -114,6 +98,5 @@ public class LoginDto
 
 public class AdminLoginDto
 {
-    public string token { get; set; }
+    public string message;
 }
-
