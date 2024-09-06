@@ -62,7 +62,7 @@ export default {
       this.isSubmitting = true;
 
       try {
-        const response = await axios.post(`${BACKEND_BASE_URL}/register`, this.form);
+        const response = await axios.post(`${BACKEND_BASE_URL}/user/register`, this.form);
 
         console.log('Registration successful:', response.data);
         this.$message.success('Registration successful! Please log in.');

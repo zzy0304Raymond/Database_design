@@ -40,11 +40,7 @@ public partial class AuctionDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseOracle(
-            "Name=ConnectionStrings:DefaultConnection",
-            oracleOptions => oracleOptions.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion21)
-            );
-
+        => optionsBuilder.UseOracle("Name=ConnectionStrings:DefaultConnection");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -149,6 +145,10 @@ public partial class AuctionDbContext : DbContext
             entity.Property(e => e.Bidtime)
                 .HasPrecision(6)
                 .HasColumnName("BIDTIME");
+            entity.Property(e => e.Itemid)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("ITEMID");
             entity.Property(e => e.Userid)
                 .HasMaxLength(20)
                 .IsUnicode(false)
@@ -157,6 +157,10 @@ public partial class AuctionDbContext : DbContext
             entity.HasOne(d => d.Auction).WithMany(p => p.Bidrecords)
                 .HasForeignKey(d => d.Auctionid)
                 .HasConstraintName("SYS_C008230");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.Bidrecords)
+                .HasForeignKey(d => d.Itemid)
+                .HasConstraintName("FK");
 
             entity.HasOne(d => d.User).WithMany(p => p.Bidrecords)
                 .HasForeignKey(d => d.Userid)
@@ -231,6 +235,10 @@ public partial class AuctionDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("ITEMID");
+            entity.Property(e => e.Category)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CATEGORY");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .IsUnicode(false)

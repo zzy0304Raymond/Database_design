@@ -15,7 +15,11 @@ public partial class Bidrecord
 
     public DateTime? Bidtime { get; set; }
 
+    public string? Itemid { get; set; }
+
     public virtual Auction? Auction { get; set; }
+
+    public virtual Item? Item { get; set; }
 
     public virtual User? User { get; set; }
 }

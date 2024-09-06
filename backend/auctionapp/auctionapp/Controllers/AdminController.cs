@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using static auctionapp.Controllers.UserController;
 
 namespace auctionapp.Controllers
 {
@@ -23,7 +24,7 @@ namespace auctionapp.Controllers
         //POST :api/admin/login
         [HttpPost("login")]
 
-        public async Task<ActionResult<AdminLoginDto>>  Login([FromBody] LoginDto loginDto)
+        public async Task<ActionResult<AdminLoginDto>> Login([FromBody] LoginDto loginDto)
         {
             var admin = await _context.Admins.Include(a => a.Users).FirstOrDefaultAsync(a => a.Users.Any(u => u.Email == loginDto.Email));
             if (admin == null)
@@ -72,11 +73,6 @@ namespace auctionapp.Controllers
 
 
 
-public class LoginDto
-{
-    public string Email { get; set; }
-    public string Password { get; set; }
-}
 
 public class AdminLoginDto
 {
