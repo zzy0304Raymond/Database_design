@@ -44,8 +44,6 @@
 <script>
 import axios from 'axios';
 
-const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
-
 export default {
   name: 'Inbox',
   data() {
@@ -73,7 +71,7 @@ export default {
     fetchMessages() {
       this.loading = true;
       const userId = localStorage.getItem('userId');
-      axios.get(`${BACKEND_BASE_URL}/users/${userId}/messages`)
+      axios.get(`http://localhost:5033/users/${userId}/messages`)
         .then(response => {
           this.messages = response.data;
           this.loading = false;
@@ -107,11 +105,17 @@ export default {
 
 <style scoped>
 .inbox {
-  padding: 20px;
+  /* padding: 20px; */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  min-height: 100vh; /* 确保背景图片覆盖整个屏幕高度 */
+  background-image: url('@/assets/images/background.jpg'); /* 背景图片 */
+  background-size: cover; /* 确保背景图片适应屏幕大小 */
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 }
 
 .inbox-card {

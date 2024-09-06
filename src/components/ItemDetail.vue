@@ -114,10 +114,9 @@ export default {
   },
   created() {
     this.fetchItemDetails();
-    this.fetchBidHistory();
   },
   methods: {
-    fetchItemDetails() {
+    async fetchItemDetails() {
       const itemId = this.$route.params.id;
       axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}`)
         .then(response => {
@@ -178,6 +177,9 @@ export default {
     },
     goToChat() {
       this.$router.push('/chat');  // 跳转到聊天页面
+    },
+    viewItem(id) {
+      this.$router.push({ name: 'ItemDetail', params: { id } });
     }
   },
 };

@@ -11,6 +11,8 @@ import Chat from '../components/Chat.vue';  // 导入 Chat 组件
 import Payment from '../components/Payment.vue';
 import UserManual from '../components/UserManual.vue'; // 导入 UserManual 组件
 import SellItem from '../components/SellItem.vue'; // 导入 SellItem 组件
+import Brand from '../components/Brand.vue';  // 导入 Brand 组件
+
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -28,7 +30,7 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: Admin,
-    meta: { requiresAuth: true },
+    meta: { requiresAdminAuth: true },
   },
   { path: '/inbox', name: 'Inbox', component: Inbox },
   { path: '/chat', name: 'Chat', component: Chat },
@@ -40,6 +42,7 @@ const routes = [
   },
   { path: '/sell', name: 'SellItem', component: SellItem }, // 添加卖出商品的路由
   { path: '/manual', name: 'UserManual', component: UserManual }, // 添加使用手册的路由
+  { path: '/brand', name: 'Brand', component: Brand }, // 添加品牌介绍的路由
 ];
 
 
@@ -59,7 +62,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdminAuth) {
     const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) return next({ name: 'AdminLogin' });
+    if (!adminToken) return next({ name: 'AdminLogin' }); // 重定向到 AdminLogin 页面
   }
 
   next();
