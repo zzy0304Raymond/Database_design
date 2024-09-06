@@ -210,6 +210,29 @@ namespace auctionapp.Controllers
             }
         }
 
+        // GET: api/auction-items/image/{id}
+        [HttpGet("image/{id}")]
+        public async Task<ActionResult<object>> GetAuctionItemImage(decimal id)
+        {
+            // 查找指定 ID 的拍卖物品
+            var item = await _context.Items.FindAsync(id);
+
+            if (item == null)
+            {
+                // 如果找不到物品，返回 404 错误
+                return NotFound(new { message = "Item not found." });
+            }
+
+            // 检查图片是否存在
+            if (item.Image == null || item.Image.Length == 0)
+            {
+                // 如果图片不存在，返回 404 错误
+                return NotFound(new { message = "Image not found for the specified item." });
+            }
+
+            // 返回文件流（假设图片是 PNG 格式，可以根据实际格式调整）
+            return File(item.Image, "image/png");
+        }
         //获取推荐物品列表
         //[HttpGet("recommendations")]
         //public async Task<IActionResult> GetRecommendedItems(string category)
