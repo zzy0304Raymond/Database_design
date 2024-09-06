@@ -54,6 +54,8 @@
 <script>
 import axios from 'axios';
 
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
+
 export default {
   data() {
     return {
@@ -82,7 +84,7 @@ export default {
     submitForm() {
       this.$refs.itemForm.validate((valid) => {
         if (valid) {
-          axios.post('http://your-api-endpoint/auction-items', this.item)
+          axios.post(`${BACKEND_BASE_URL}/auction-items`, this.item)
             .then(() => {
               this.$message.success('商品发布成功');
               this.$router.push({ name: 'Home' });

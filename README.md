@@ -5,6 +5,7 @@
 
 先安装
 ```sh
+cd frontend
 npm install
 ```
 
