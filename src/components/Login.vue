@@ -38,6 +38,8 @@
 <script>
 import axios from 'axios'; // 引入 axios 用于发送 HTTP 请求
 
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
+
 export default {
   name: 'Login', // 组件名称
   data() {
@@ -58,7 +60,7 @@ export default {
 
       try {
         // 发送 POST 请求到登录 API，提交用户的邮箱和密码
-        const response = await axios.post('http://localhost:5033/login', {
+        const response = await axios.post(`${BACKEND_BASE_URL}/login`, {
           email: this.form.email,
           password: this.form.password,
         });
@@ -67,7 +69,7 @@ export default {
         const { token, user } = response.data;
 
         // 将 token 和用户 ID 存储到本地存储中
-        localStorage.setItem('authToken', token); 
+        localStorage.setItem('authToken', token);
         localStorage.setItem('userId', user.id);
 
         // 可选：将用户信息存储到 Vuex 以便全局访问（假设你在使用 Vuex）

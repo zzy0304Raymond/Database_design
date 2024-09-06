@@ -81,6 +81,8 @@
 <script>
 import axios from 'axios'; // 引入 axios 用于发送 HTTP 请求
 
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
+
 export default {
   name: 'UserProfile', // 组件名称
   data() {
@@ -109,7 +111,7 @@ export default {
     async fetchUserData() {
       const userId = localStorage.getItem('userId');
       try {
-        const response = await axios.get(`http://localhost:5033/users/${userId}`);
+        const response = await axios.get(`${BACKEND_BASE_URL}/users/${userId}`);
         this.user = response.data;
         this.editForm = { ...response.data };
       } catch (error) {
@@ -123,7 +125,7 @@ export default {
     async fetchBiddingHistory() {
       const userId = localStorage.getItem('userId');
       try {
-        const response = await axios.get(`http://localhost:5033/users/${userId}/bids`);
+        const response = await axios.get(`${BACKEND_BASE_URL}/users/${userId}/bids`);
         this.bids = response.data;
       } catch (error) {
         console.error('Error fetching bidding history:', error);
@@ -144,7 +146,7 @@ export default {
 
       const userId = localStorage.getItem('userId');
       try {
-        await axios.put(`http://localhost:5033/users/${userId}`, this.editForm);
+        await axios.put(`${BACKEND_BASE_URL}/users/${userId}`, this.editForm);
         this.user = { ...this.editForm };
         this.editProfileDialog = false;
         this.$message.success('Profile updated successfully');
@@ -161,30 +163,41 @@ export default {
 
 <style scoped>
 .user-profile {
-  padding: 20px; /* 内边距 */
-  display: flex; /* 使用 flex 布局 */
-  flex-direction: column; /* 垂直排列 */
-  align-items: center; /* 水平居中 */
+  padding: 20px;
+  /* 内边距 */
+  display: flex;
+  /* 使用 flex 布局 */
+  flex-direction: column;
+  /* 垂直排列 */
+  align-items: center;
+  /* 水平居中 */
 }
 
 .profile-header {
-  display: flex; /* 使用 flex 布局 */
-  align-items: center; /* 垂直居中 */
+  display: flex;
+  /* 使用 flex 布局 */
+  align-items: center;
+  /* 垂直居中 */
 }
 
 .profile-info {
-  margin-left: 20px; /* 左侧间距 */
+  margin-left: 20px;
+  /* 左侧间距 */
 }
 
 .profile-card,
 .bidding-history-card {
-  width: 100%; /* 宽度设为 100% */
-  max-width: 800px; /* 最大宽度为 800px */
-  margin-bottom: 20px; /* 底部间距 */
+  width: 100%;
+  /* 宽度设为 100% */
+  max-width: 800px;
+  /* 最大宽度为 800px */
+  margin-bottom: 20px;
+  /* 底部间距 */
 }
 
 .profile-card h1,
 .bidding-history-card h2 {
-  margin-bottom: 20px; /* 标题底部间距 */
+  margin-bottom: 20px;
+  /* 标题底部间距 */
 }
 </style>

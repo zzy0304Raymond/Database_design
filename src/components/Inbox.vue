@@ -44,6 +44,8 @@
 <script>
 import axios from 'axios';
 
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
+
 export default {
   name: 'Inbox',
   data() {
@@ -71,7 +73,7 @@ export default {
     fetchMessages() {
       this.loading = true;
       const userId = localStorage.getItem('userId');
-      axios.get(`http://localhost:5033/users/${userId}/messages`)
+      axios.get(`${BACKEND_BASE_URL}/users/${userId}/messages`)
         .then(response => {
           this.messages = response.data;
           this.loading = false;

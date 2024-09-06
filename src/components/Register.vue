@@ -13,15 +13,18 @@
         <!-- 表单组件，绑定到 form 数据对象，设置表单验证规则 -->
         <el-form @submit.prevent="register" :model="form" ref="form" label-width="100px">
           <!-- 用户名输入框，设置必填验证 -->
-          <el-form-item label="Username" :rules="[{ required: true, message: 'Please input your username', trigger: 'blur' }]">
+          <el-form-item label="Username"
+            :rules="[{ required: true, message: 'Please input your username', trigger: 'blur' }]">
             <el-input v-model="form.username"></el-input>
           </el-form-item>
           <!-- 邮箱输入框，设置必填和格式验证 -->
-          <el-form-item label="Email" :rules="[{ required: true, message: 'Please input your email', trigger: 'blur' }, { type: 'email', message: 'Please input a valid email', trigger: ['blur', 'change'] }]">
+          <el-form-item label="Email"
+            :rules="[{ required: true, message: 'Please input your email', trigger: 'blur' }, { type: 'email', message: 'Please input a valid email', trigger: ['blur', 'change'] }]">
             <el-input v-model="form.email"></el-input>
           </el-form-item>
           <!-- 密码输入框，设置必填验证 -->
-          <el-form-item label="Password" :rules="[{ required: true, message: 'Please input your password', trigger: 'blur' }]">
+          <el-form-item label="Password"
+            :rules="[{ required: true, message: 'Please input your password', trigger: 'blur' }]">
             <el-input type="password" v-model="form.password"></el-input>
           </el-form-item>
           <!-- 提交按钮，调用 submitForm 方法 -->
@@ -36,6 +39,8 @@
 
 <script>
 import axios from 'axios';
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
   name: 'Register',
@@ -65,7 +70,7 @@ export default {
       this.isSubmitting = true;
 
       try {
-        const response = await axios.post('http://localhost:5033/register', this.form);
+        const response = await axios.post(`${BACKEND_BASE_URL}/register`, this.form);
 
         console.log('Registration successful:', response.data);
         this.$message.success('Registration successful! Please log in.');

@@ -36,7 +36,7 @@
       <el-table-column prop="amount" label="Bid Amount" width="150"></el-table-column>
       <el-table-column prop="time" label="Time"></el-table-column>
     </el-table>
-    
+
     <!-- 商品详细信息 -->
     <div class="product-details-container">
       <div class="product-details">
@@ -49,12 +49,8 @@
 
     <!-- 聊天窗口 -->
     <el-dialog title="Chat with Seller" :visible.sync="chatVisible" width="50%">
-      <el-input
-        type="textarea"
-        v-model="chatMessage"
-        placeholder="Type your message here..."
-        class="chat-input"
-      ></el-input>
+      <el-input type="textarea" v-model="chatMessage" placeholder="Type your message here..."
+        class="chat-input"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="chatVisible = false">Cancel</el-button>
         <el-button type="primary" @click="sendMessage">Send</el-button>
@@ -74,12 +70,14 @@
         </el-col>
       </el-row>
     </div>
-    
+
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
   name: 'ItemDetail',
@@ -120,51 +118,42 @@ export default {
   methods: {
     async fetchItemDetails() {
       const itemId = this.$route.params.id;
-      try {
-        const response = await axios.get(`http://localhost:5033/auction-items/${itemId}`);
-        this.item = response.data;
-        this.bidAmount = this.minimumNextBid;
-        this.fetchBidHistory(itemId);
-        this.fetchRecommendations();
-      } catch (error) {
-        this.error = 'Failed to load item details.';
-        console.error('Error fetching item details:', error);
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    async fetchRecommendations() {
-      try {
-        const response = await axios.get(`http://localhost:5033/auction-items/recommendations`, {
-          params: { category: this.item.category }
+      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}`)
+        .then(response => {
+          this.item = response.data;
+          this.bidAmount = this.minimumNextBid; // 设置默认出价为最小下一次出价
+        })
+        .catch(error => {
+          console.error('Error fetching item details:', error);
         });
-        this.recommendedItems = response.data;
-      } catch (error) {
-        console.error('Error fetching recommendations:', error);
-      }
     },
-    async fetchBidHistory(itemId) {
-      try {
-        const response = await axios.get(`http://localhost:5033/auction-items/${itemId}/bids`);
-        this.bids = response.data;
-      } catch (error) {
-        console.error('Error fetching bid history:', error);
-      }
+    fetchRecommendations() {
+      const category = this.item.category;
+      axios.get(`${BACKEND_BASE_URL}/auction-items/recommendations?category=${category}`)
+        .then(response => {
+          this.recommendedItems = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching recommendations:', error);
+        });
     },
-    async bidNow() {
+    viewItem(id) {
+      this.$router.push({ name: 'ItemDetail', params: { id } });
+    },
+    fetchBidHistory() {
+      const itemId = this.$route.params.id;
+      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}/bids`)
+        .then(response => {
+          this.bids = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching bid history:', error);
+        });
+    },
+    bidNow() {
       if (this.bidAmount < this.minimumNextBid) {
         this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
         return;
-      }
-      try {
-        await axios.post(`http://localhost:5033/auction-items/${this.item.id}/bid`, {
-          bidAmount: this.bidAmount,
-        });
-        this.$message.success('Bid placed successfully!');
-        this.fetchBidHistory(this.item.id); // 更新出价历史
-      } catch (error) {
-        console.error('Error placing bid:', error);
-        this.$message.error('Failed to place bid.');
       }
       // 传递出价金额和数量到支付页面
       this.$router.push({
@@ -262,7 +251,8 @@ export default {
 .button-group {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* 保证按钮宽度一致 */
+  align-items: stretch;
+  /* 保证按钮宽度一致 */
   gap: 10px;
 }
 
@@ -318,7 +308,7 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.el-button + .el-button {
+.el-button+.el-button {
   margin-left: 0;
 }
 

@@ -18,22 +18,12 @@
 
     <!-- 搜索栏和过滤器 -->
     <div class="search-filter-bar">
-      <el-input
-        v-model="searchQuery"
-        placeholder="Search items..."
-        class="search-bar"
-        clearable
-      >
+      <el-input v-model="searchQuery" placeholder="Search items..." class="search-bar" clearable>
         <template #append>
           <el-button icon="el-icon-search" @click="searchItems">Search</el-button>
         </template>
       </el-input>
-      <el-select
-        v-model="selectedCategory"
-        placeholder="Select Category"
-        @change="filterByCategory"
-        class="filter-bar"
-      >
+      <el-select v-model="selectedCategory" placeholder="Select Category" @change="filterByCategory" class="filter-bar">
         <el-option label="All Categories" value=""></el-option>
         <el-option label="Antiques" value="Antiques"></el-option>
         <el-option label="Art" value="Art"></el-option>
@@ -60,14 +50,8 @@
     </el-row>
 
     <!-- 翻页控件 -->
-    <el-pagination
-      @current-change="handlePageChange"
-      :current-page="currentPage"
-      :page-size="itemsPerPage"
-      layout="prev, pager, next"
-      :total="filteredItems.length"
-      class="pagination"
-    ></el-pagination>
+    <el-pagination @current-change="handlePageChange" :current-page="currentPage" :page-size="itemsPerPage"
+      layout="prev, pager, next" :total="filteredItems.length" class="pagination"></el-pagination>
 
     <!-- 品牌介绍模块 -->
     <div class="brand-intro">
@@ -78,12 +62,13 @@
     </div>
 
 
-
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
 export default {
   name: 'Home',
@@ -120,7 +105,7 @@ export default {
   methods: {
     async fetchAuctionItems() {
       try {
-        const response = await axios.get('http://localhost:5033/api/auction-items', {
+        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items`, {
           params: {
             page: this.currentPage,
             perPage: this.itemsPerPage,
@@ -135,7 +120,7 @@ export default {
     },
     async fetchDiscountItems() {
       try {
-        const response = await axios.get('/api/discount-items');
+        const response = await axios.get(`${BACKEND_BASE_URL}/discount-items`);
         this.discountItems = response.data.items;
       } catch (error) {
         console.error('Error fetching discount items:', error);
@@ -146,7 +131,7 @@ export default {
     },
     async searchItems() {
       try {
-        const response = await axios.get('/api/search-items', {
+        const response = await axios.get(`${BACKEND_BASE_URL}/search-items`, {
           params: { query: this.searchQuery }
         });
         this.searchResults = response.data.items;
@@ -181,46 +166,76 @@ export default {
   flex-direction: column; /* 垂直排列元素 */
   align-items: center; /* 水平居中 */
   background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%); /* 渐变背景 */
+  display: flex;
+  /* 使用 Flex 布局 */
+  flex-direction: column;
+  /* 垂直排列元素 */
+  align-items: center;
+  /* 水平居中 */
+  background: #f5f7fa;
+  /* 设置背景颜色 */
 }
 
 .navbar {
   width: 100%;
   background-color: #056bd2; /* 导航栏背景色 */
   margin-bottom: 20px; /* 与下方内容间距 */
+  background-color: #2c3e50;
+  /* 导航栏背景色 */
+  margin-bottom: 20px;
+  /* 与下方内容间距 */
 }
 
 .nav-menu {
   background-color: #2288ed; /* 菜单背景色 */
   color: white; /* 菜单文字颜色 */
+  background-color: #2c3e50;
+  /* 菜单背景色 */
+  color: white;
+  /* 菜单文字颜色 */
 }
 
 .page-title {
-  font-size: 2.5rem; /* 标题字体大小 */
-  font-weight: bold; /* 标题字体加粗 */
-  margin: 20px 0; /* 上下间距 */
-  color: #34495e; /* 标题颜色 */
-  text-align: center; /* 居中对齐 */
+  font-size: 2.5rem;
+  /* 标题字体大小 */
+  font-weight: bold;
+  /* 标题字体加粗 */
+  margin: 20px 0;
+  /* 上下间距 */
+  color: #34495e;
+  /* 标题颜色 */
+  text-align: center;
+  /* 居中对齐 */
 }
 
 .search-filter-bar {
-  display: flex; /* 使用 Flex 布局 */
+  display: flex;
+  /* 使用 Flex 布局 */
   width: 80%;
-  justify-content: space-between; /* 两端对齐 */
-  margin-bottom: 30px; /* 与下方内容间距 */
+  justify-content: space-between;
+  /* 两端对齐 */
+  margin-bottom: 30px;
+  /* 与下方内容间距 */
 }
 
 .search-bar,
 .filter-bar {
-  flex: 1; /* 平分 Flex 容器 */
-  margin: 0 10px; /* 左右间距 */
-  max-width: 300px; /* 最大宽度 */
+  flex: 1;
+  /* 平分 Flex 容器 */
+  margin: 0 10px;
+  /* 左右间距 */
+  max-width: 300px;
+  /* 最大宽度 */
 }
 
 .auction-list {
   width: 100%;
-  display: flex; /* 使用 Flex 布局 */
-  flex-wrap: wrap; /* 换行显示 */
-  justify-content: flex-start; /* 居中对齐 */
+  display: flex;
+  /* 使用 Flex 布局 */
+  flex-wrap: wrap;
+  /* 换行显示 */
+  justify-content: flex-start;
+  /* 居中对齐 */
 }
 
 .auction-item {
@@ -230,12 +245,22 @@ export default {
   transition: box-shadow 0.3s ease; /* 阴影过渡效果 */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
+  margin: 10px;
+  /* 四周间距 */
+  padding: 20px;
+  /* 内边距 */
+  border-radius: 10px;
+  /* 圆角 */
+  transition: box-shadow 0.3s ease;
+  /* 阴影过渡效果 */
 }
 
 .auction-item:hover {
   transform: translateY(-5px); /* 悬停时的轻微上移效果 */
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* 加强阴影效果 */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* 悬停时阴影效果 */
 }
 
 .item-image {
@@ -261,18 +286,23 @@ export default {
 }
 
 .pagination {
-  margin-top: 20px; /* 与上方内容间距 */
-  display: flex; /* 使用 Flex 布局 */
-  justify-content: center; /* 居中对齐 */
+  margin-top: 20px;
+  /* 与上方内容间距 */
+  display: flex;
+  /* 使用 Flex 布局 */
+  justify-content: center;
+  /* 居中对齐 */
 }
 
 .discount-section {
-  width: 100vw; /* 全屏宽度 */
+  width: 100vw;
+  /* 全屏宽度 */
   margin: 20px 0;
   padding: 20px 0;
   background-color: #fff;
   text-align: center;
-  overflow: hidden; /* 防止超出内容 */
+  overflow: hidden;
+  /* 防止超出内容 */
 }
 
 .discount-item {
@@ -289,16 +319,20 @@ export default {
 
 .discount-item img {
   width: auto;
-  height: 150px; /* 图片高度 */
+  height: 150px;
+  /* 图片高度 */
   border-radius: 8px;
 }
+
 .brand-intro {
   text-align: center;
   padding: 20px;
   background-color: #f9f9f9;
-  width: 100%; /* 占满页面宽度 */
+  width: 100%;
+  /* 占满页面宽度 */
   margin: 20px 0;
-  box-sizing: border-box; /* 包含 padding 在内的宽度 */
+  box-sizing: border-box;
+  /* 包含 padding 在内的宽度 */
 }
 
 .dialog-image {
