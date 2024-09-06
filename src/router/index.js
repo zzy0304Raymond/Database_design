@@ -30,7 +30,7 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: Admin,
-    meta: { requiresAuth: true },
+    meta: { requiresAdminAuth: true },
   },
   { path: '/inbox', name: 'Inbox', component: Inbox },
   { path: '/chat', name: 'Chat', component: Chat },
@@ -62,7 +62,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdminAuth) {
     const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) return next({ name: 'AdminLogin' });
+    if (!adminToken) return next({ name: 'AdminLogin' }); // 重定向到 AdminLogin 页面
   }
 
   next();

@@ -107,8 +107,6 @@ export default {
       try {
         const response = await axios.get(`${BACKEND_BASE_URL}/auction-items`, {
           params: {
-            page: this.currentPage,
-            perPage: this.itemsPerPage,
             searchQuery: this.searchQuery,
             category: this.selectedCategory,
           }

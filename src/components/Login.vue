@@ -102,10 +102,12 @@ export default {
 .login-page {
   display: flex;
   height: 100vh; /* 让页面高度全屏 */
+  flex-direction: row; /* 强制左右布局 */
   background-image: url('@/assets/images/background.jpg'); /* 使用上传的图片作为背景 */
   background-size: cover; /* 使背景图片覆盖整个区域 */
   background-position: center; /* 图片居中显示 */
   background-repeat: no-repeat; /* 防止图片重复 */
+  flex-wrap: nowrap; /* 防止内容换行 */
 }
 
 .left-section {

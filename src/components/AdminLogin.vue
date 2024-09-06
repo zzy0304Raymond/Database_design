@@ -1,34 +1,30 @@
 <template>
   <div class="admin-login">
-    <!-- 使用 el-card 组件作为登录卡片的容器 -->
-    <el-card class="login-card">
-      <h1>Admin Login</h1>
-      <!-- el-form 表单组件，用于收集用户输入 -->
-      <!-- @submit.prevent="login" 阻止默认的提交事件并调用 login 方法 -->
-      <!-- :model="form" 绑定表单数据到 form 对象 -->
-      <!-- ref="form" 用于表单的验证 -->
-      <!-- label-width="100px" 设置表单标签的宽度 -->
-      <el-form @submit.prevent="login" :model="form" ref="form" label-width="100px">
-        <!-- 表单项：邮箱 -->
-        <!-- :rules 属性定义了表单验证规则 -->
+    <div class="left-section">
+      <h1>AuctionHub.Welcome.</h1>
+      <p>Secure Your Dream Deals with Every Smart Bid</p>
+    </div>
+
+    <div class="right-section">
+      <h1>Admin Login</h1> <!-- 页面标题 -->
+      <!-- 登录表单，使用 el-form 组件 -->
+      <el-form @submit.prevent="login" :model="form" label-position="top" class="login-form">
+        <!-- 表单项：邮箱输入框 -->
         <el-form-item label="Email"
           :rules="[{ required: true, message: 'Please input your email', trigger: 'blur' }, { type: 'email', message: 'Please input a valid email', trigger: ['blur', 'change'] }]">
-          <!-- el-input 用于输入邮箱，v-model 绑定到 form.email -->
-          <el-input type="email" v-model="form.email"></el-input>
+          <el-input type="email" v-model="form.email" required style="width: 100%;"></el-input>
         </el-form-item>
-        <!-- 表单项：密码 -->
+        <!-- 表单项：密码输入框 -->
         <el-form-item label="Password"
           :rules="[{ required: true, message: 'Please input your password', trigger: 'blur' }]">
-          <!-- el-input 用于输入密码，v-model 绑定到 form.password -->
-          <el-input type="password" v-model="form.password"></el-input>
+          <el-input type="password" v-model="form.password" required style="width: 100%;"></el-input>
         </el-form-item>
         <!-- 表单项：登录按钮 -->
         <el-form-item>
-          <!-- el-button 登录按钮，点击时调用 submitForm 方法 -->
-          <el-button type="primary" @click="submitForm">Login</el-button>
+          <el-button type="primary" @click="submitForm" style="width: 100%;">Login</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -89,27 +85,74 @@ export default {
 
 <style scoped>
 .admin-login {
-  padding: 20px;
-  /* 设置内边距 */
   display: flex;
-  /* 使用 flex 布局 */
-  justify-content: center;
-  /* 水平居中 */
-  align-items: center;
-  /* 垂直居中 */
-  height: 100vh;
-  /* 高度设为视口高度 */
+  height: 100vh; /* 让页面高度全屏 */
+
+  background-image: url('@/assets/images/background.jpg'); /* 使用上传的图片作为背景 */
+  background-size: cover; /* 使背景图片覆盖整个区域 */
+  background-position: center; /* 图片居中显示 */
+  background-repeat: no-repeat; /* 防止图片重复 */
+
 }
 
-.login-card {
-  width: 400px;
-  /* 登录卡片的宽度 */
+.left-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 使文字上移 */
+  align-items: flex-end;
+  color: rgb(29, 88, 251);
+  padding: 100px;
+  margin-top: 80px; /* 根据需要调整上移的距离 */
 }
 
-.login-card h1 {
-  text-align: center;
-  /* 标题居中 */
+.left-section h1 {
+  font-size: 2.5rem;
   margin-bottom: 20px;
-  /* 标题下方的间距 */
+}
+
+.left-section p {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.right-section {
+  flex: 1; /* 右侧占据一半页面 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 确保登录框从顶部开始 */
+  align-items: center; /* 水平居中 */
+  padding: 40px;
+  background-color: rgb(243, 243, 243); /* 设置右侧背景色 */
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 100px; /* 可以通过增大或缩小此值调整标题位置 */
+}
+
+.login-form {
+  max-width: 400px;
+  width: 100%;
+  padding: 40px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.el-button {
+  width: 100%;
+  height: 40px;
+}
+
+p {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 0; /* 确保与表单下方没有额外间距 */
 }
 </style>
