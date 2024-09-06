@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Online Auction</h1>
+    <h1>AuctionHub</h1>
 
     <!-- 折扣推荐模块 -->
     <div class="discount-section">
@@ -71,10 +71,12 @@
 
     <!-- 品牌介绍模块 -->
     <div class="brand-intro">
-      <h2>品牌介绍</h2>
-      <p>我们的品牌致力于提供高品质产品，服务全球用户...</p>
+      <h2>关于AuctionHub</h2>
+      <p>AuctionHub 是全球领先的在线拍卖平台，我们致力于为用户提供可靠、安全的在线拍卖体验。通过先进的技术和广泛的市场网络，我们确保每一位用户都能轻松地找到心仪的商品，并通过竞价获得最优惠的交易。</p>
+      <p>我们的使命是重新定义在线拍卖，以高效、透明和用户为核心的方式连接买家和卖家。无论是珍藏品、艺术品，还是高科技电子产品，我们都为用户提供丰富多样的拍卖选择。</p>
       <el-button type="primary" @click="learnMore">了解更多</el-button>
     </div>
+
 
 
   </div>
@@ -118,7 +120,7 @@ export default {
   methods: {
     async fetchAuctionItems() {
       try {
-        const response = await axios.get('/api/auction-items', {
+        const response = await axios.get('http://localhost:5033/api/auction-items', {
           params: {
             page: this.currentPage,
             perPage: this.itemsPerPage,
@@ -178,17 +180,17 @@ export default {
   display: flex; /* 使用 Flex 布局 */
   flex-direction: column; /* 垂直排列元素 */
   align-items: center; /* 水平居中 */
-  background: #f5f7fa; /* 设置背景颜色 */
+  background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%); /* 渐变背景 */
 }
 
 .navbar {
   width: 100%;
-  background-color: #2c3e50; /* 导航栏背景色 */
+  background-color: #056bd2; /* 导航栏背景色 */
   margin-bottom: 20px; /* 与下方内容间距 */
 }
 
 .nav-menu {
-  background-color: #2c3e50; /* 菜单背景色 */
+  background-color: #2288ed; /* 菜单背景色 */
   color: white; /* 菜单文字颜色 */
 }
 
@@ -226,10 +228,14 @@ export default {
   padding: 20px; /* 内边距 */
   border-radius: 10px; /* 圆角 */
   transition: box-shadow 0.3s ease; /* 阴影过渡效果 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
 
 .auction-item:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 悬停时阴影效果 */
+  transform: translateY(-5px); /* 悬停时的轻微上移效果 */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* 加强阴影效果 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .item-image {
@@ -238,6 +244,20 @@ export default {
   object-fit: cover; /* 保持图片比例 */
   border-radius: 8px; /* 图片圆角 */
   margin-bottom: 10px; /* 图片与下方文字的间距 */
+  transition: transform 0.3s ease; /* 添加图片缩放动画 */
+}
+
+.item-image:hover {
+  transform: scale(1.05); /* 悬停时图片轻微放大 */
+}
+
+.el-button {
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.el-button:hover {
+  transform: scale(1.05); /* 按钮悬停时轻微放大 */
+  background-color: #2c3e50; /* 改变背景色 */
 }
 
 .pagination {
@@ -260,7 +280,13 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.3s ease; /* 折扣商品的悬停动画 */
 }
+
+.discount-item:hover {
+  transform: scale(1.05); /* 悬停时轻微放大 */
+}
+
 .discount-item img {
   width: auto;
   height: 150px; /* 图片高度 */
@@ -273,6 +299,14 @@ export default {
   width: 100%; /* 占满页面宽度 */
   margin: 20px 0;
   box-sizing: border-box; /* 包含 padding 在内的宽度 */
+}
+
+.dialog-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 </style>

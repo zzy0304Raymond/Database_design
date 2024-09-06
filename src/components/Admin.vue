@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     fetchAuctionItems() {
-      axios.get('http://your-api-endpoint/auction-items')
+      axios.get('http://localhost:5033/auction-items')
         .then(response => {
           this.auctionItems = response.data;
         })
@@ -110,7 +110,7 @@ export default {
     },
     addItem() {
       this.isAddingItem = true;
-      axios.post('http://your-api-endpoint/auction-items', this.newItem)
+      axios.post('http://localhost:5033/auction-items', this.newItem)
         .then(response => {
           this.auctionItems.push(response.data);
           this.resetNewItemForm();
@@ -143,7 +143,7 @@ export default {
     },
     updateItem() {
       this.isUpdatingItem = true;
-      axios.put(`http://your-api-endpoint/auction-items/${this.editingItem.id}`, this.editingItem)
+      axios.put(`http://localhost:5033/auction-items/${this.editingItem.id}`, this.editingItem)
         .then(response => {
           const index = this.auctionItems.findIndex(item => item.id === this.editingItem.id);
           this.$set(this.auctionItems, index, response.data);
@@ -159,7 +159,7 @@ export default {
         });
     },
     deleteItem(id) {
-      axios.delete(`http://your-api-endpoint/auction-items/${id}`)
+      axios.delete(`http://localhost:5033/auction-items/${id}`)
         .then(response => {
           const index = this.auctionItems.findIndex(item => item.id === id);
           this.auctionItems.splice(index, 1);

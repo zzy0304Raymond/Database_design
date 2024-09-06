@@ -109,7 +109,7 @@ export default {
     async fetchUserData() {
       const userId = localStorage.getItem('userId');
       try {
-        const response = await axios.get(`http://your-api-endpoint/users/${userId}`);
+        const response = await axios.get(`http://localhost:5033/users/${userId}`);
         this.user = response.data;
         this.editForm = { ...response.data };
       } catch (error) {
@@ -123,7 +123,7 @@ export default {
     async fetchBiddingHistory() {
       const userId = localStorage.getItem('userId');
       try {
-        const response = await axios.get(`http://your-api-endpoint/users/${userId}/bids`);
+        const response = await axios.get(`http://localhost:5033/users/${userId}/bids`);
         this.bids = response.data;
       } catch (error) {
         console.error('Error fetching bidding history:', error);
@@ -144,7 +144,7 @@ export default {
 
       const userId = localStorage.getItem('userId');
       try {
-        await axios.put(`http://your-api-endpoint/users/${userId}`, this.editForm);
+        await axios.put(`http://localhost:5033/users/${userId}`, this.editForm);
         this.user = { ...this.editForm };
         this.editProfileDialog = false;
         this.$message.success('Profile updated successfully');

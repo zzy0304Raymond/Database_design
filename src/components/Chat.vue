@@ -55,7 +55,7 @@
     methods: {
       async fetchChatHistory(senderId) {
         try {
-          const response = await axios.get(`http://your-api-endpoint/chats/${senderId}`);
+          const response = await axios.get(`http://localhost:5033/chats/${senderId}`);
           this.messages = response.data;
           this.scrollToBottom();
         } catch (error) {

@@ -63,7 +63,7 @@ export default {
     // 登录方法，向服务器发送登录请求
     login() {
       this.isLoggingIn = true;
-      axios.post('http://your-api-endpoint/admin/login', { // 使用 axios 发送 POST 请求
+      axios.post('http://localhost:5033/admin/login', { // 使用 axios 发送 POST 请求
         email: this.form.email, // 提交邮箱
         password: this.form.password, // 提交密码
       })

@@ -116,58 +116,66 @@ export default {
   },
   created() {
     this.fetchItemDetails();
-    this.fetchBidHistory();
   },
   methods: {
-    fetchItemDetails() {
+    async fetchItemDetails() {
       const itemId = this.$route.params.id;
-      axios.get(`http://your-api-endpoint/auction-items/${itemId}`)
-        .then(response => {
-          this.item = response.data;
-          this.bidAmount = this.minimumNextBid; // 设置默认出价为最小下一次出价
-        })
-        .catch(error => {
-          console.error('Error fetching item details:', error);
-        });
-    },
-    fetchRecommendations() {
-      const category = this.item.category;
-      axios.get(`http://your-api-endpoint/auction-items/recommendations?category=${category}`)
-        .then(response => {
-          this.recommendedItems = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching recommendations:', error);
-        });
-    },
-    viewItem(id) {
-      this.$router.push({ name: 'ItemDetail', params: { id } });
-    },
-    fetchBidHistory() {
-      const itemId = this.$route.params.id;
-      axios.get(`http://your-api-endpoint/auction-items/${itemId}/bids`)
-        .then(response => {
-          this.bids = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching bid history:', error);
-        });
-    },
-    bidNow() {
-    if (this.bidAmount < this.minimumNextBid) {
-      this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
-      return;
-    }
-    // 传递出价金额和数量到支付页面
-    this.$router.push({
-      name: 'Payment',
-      params: {
-        itemName: this.item.name,
-        amount: this.bidAmount,
-        quantity: this.quantity
+      try {
+        const response = await axios.get(`http://localhost:5033/auction-items/${itemId}`);
+        this.item = response.data;
+        this.bidAmount = this.minimumNextBid;
+        this.fetchBidHistory(itemId);
+        this.fetchRecommendations();
+      } catch (error) {
+        this.error = 'Failed to load item details.';
+        console.error('Error fetching item details:', error);
+      } finally {
+        this.isLoading = false;
       }
-    });
-  },
+    },
+    async fetchRecommendations() {
+      try {
+        const response = await axios.get(`http://localhost:5033/auction-items/recommendations`, {
+          params: { category: this.item.category }
+        });
+        this.recommendedItems = response.data;
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+      }
+    },
+    async fetchBidHistory(itemId) {
+      try {
+        const response = await axios.get(`http://localhost:5033/auction-items/${itemId}/bids`);
+        this.bids = response.data;
+      } catch (error) {
+        console.error('Error fetching bid history:', error);
+      }
+    },
+    async bidNow() {
+      if (this.bidAmount < this.minimumNextBid) {
+        this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
+        return;
+      }
+      try {
+        await axios.post(`http://localhost:5033/auction-items/${this.item.id}/bid`, {
+          bidAmount: this.bidAmount,
+        });
+        this.$message.success('Bid placed successfully!');
+        this.fetchBidHistory(this.item.id); // 更新出价历史
+      } catch (error) {
+        console.error('Error placing bid:', error);
+        this.$message.error('Failed to place bid.');
+      }
+      // 传递出价金额和数量到支付页面
+      this.$router.push({
+        name: 'Payment',
+        params: {
+          itemName: this.item.name,
+          amount: this.bidAmount,
+          quantity: this.quantity
+        }
+      });
+    },
     // 添加到购物车
     addToCart() {
       // 实现添加到购物车的逻辑
@@ -180,6 +188,9 @@ export default {
     },
     goToChat() {
       this.$router.push('/chat');  // 跳转到聊天页面
+    },
+    viewItem(id) {
+      this.$router.push({ name: 'ItemDetail', params: { id } });
     }
   },
 };

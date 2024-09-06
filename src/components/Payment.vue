@@ -76,7 +76,7 @@
           };
 
           // 向服务器发送支付请求
-          const response = await axios.post('http://your-api-endpoint/payment', paymentData);
+          const response = await axios.post('http://localhost:5033/payment', paymentData);
 
           // 如果支付成功，展示成功信息并跳转
           if (response.data.success) {
