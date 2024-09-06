@@ -33,7 +33,7 @@ namespace auctionapp.Controllers
             }
             try
             {
-                var user = await _context.Users.FindAsync(loginDto.email);
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Email==loginDto.email);
                 if (user == null)
                 {
                     return NotFound(new { message = "Email does not exist !" });
@@ -51,7 +51,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while logging in!" });
+                return StatusCode(500, ex.Message);
             }
             //var user = await _context.Users.FindAsync(loginDto.)
             //if (user == null || !VerifyPassword(loginDto.Password, user.Password))
@@ -64,33 +64,34 @@ namespace auctionapp.Controllers
         }
 
 
-        [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto newuser)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { message = "Invalid input data." });
-            }
-            try
-            {
-                var user = new User
-                {
-                    Username = newuser.username,
-                    Email = newuser.email,
-                    Password = newuser.password,
-                    Registrationdate = DateTime.UtcNow
-                };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+        //[HttpPost("register")]
+        //public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto newuser)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(new { message = "Invalid input data." });
+        //    }
+        //    try
+        //    {
+        //        var user = new User
+        //        {
+        //            Userid=User
+        //            Username = newuser.username,
+        //            Email = newuser.email,
+        //            Password = newuser.password,
+        //            Registrationdate = DateTime.UtcNow
+        //        };
+        //        _context.Users.Add(user);
+        //        await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(Register), new { id = user.Userid }, new UserDto { id = user.Userid, username = user.Username, email = user.Email });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while adding a new user!" });
-            }
+        //        return CreatedAtAction(nameof(Register), new { id = user.Userid }, new UserDto { id = user.Userid, username = user.Username, email = user.Email });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = "An error occurred while adding a new user!" });
+        //    }
 
-        }
+        //}
 
         [HttpGet("users/{userId}")]
         public async Task<ActionResult<UserDetailsDto>> GetUser(string userId)

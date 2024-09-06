@@ -48,21 +48,21 @@ namespace auctionapp.Controllers
                     startingBid = item.Startingprice,
                     description = item.Description,
                     condition = "New", // 
-                    details = item.Feedbackpublishes.FirstOrDefault().Feedback.Content,
+                    details = "item.Feedbackpublishes.FirstOrDefault().Feedback.Content",
                     stock = item.Users.Count, //
                     category = "General", // 
-                    recommendedItems = item.Auctions.Select(a => new
-                    {
-                        auctionId = a.Auctionid,
-                        name = item.Itemname,
-                        images = item.Image != null ? Convert.ToBase64String(item.Image) : null,
-                        currentBid = a.Currenthighestbid,
-                        startingBid = item.Startingprice,
-                        description = item.Description,
-                        condition = "New",
-                        details = " ",
-                        stock = item.Users.Count
-                    })
+                    //recommendedItems = item.Auctions.Select(a => new
+                    //{
+                    //    auctionId = a.Auctionid,
+                    //    name = item.Itemname,
+                    //    images = item.Image != null ? Convert.ToBase64String(item.Image) : null,
+                    //    currentBid = a.Currenthighestbid,
+                    //    startingBid = item.Startingprice,
+                    //    description = item.Description,
+                    //    condition = "New",
+                    //    details = " ",
+                    //    stock = item.Users.Count
+                    //})
                 };
 
                 // 返回200状态码和拍卖物品的详细信息
@@ -146,7 +146,7 @@ namespace auctionapp.Controllers
 
         // PUT: api/auction-items/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<AuctionItemDto>> UpdateAuctionItem(string id, [FromBody] CreateAuctionItemDto updatedItem)
+        public async Task<ActionResult<AuctionItemDto>> UpdateAuctionItem(decimal id, [FromBody] CreateAuctionItemDto updatedItem)
         {
             if (!ModelState.IsValid)
             {
@@ -183,13 +183,13 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the auction item." });
+                return StatusCode(500, ex.Message);
             }
         }
 
         // DELETE: api/auction-items/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAuctionItem(string id)
+        public async Task<IActionResult> DeleteAuctionItem(decimal id)
         {
             try
             {
@@ -200,13 +200,14 @@ namespace auctionapp.Controllers
                 }
 
                 _context.Items.Remove(item);
+               
                 await _context.SaveChangesAsync();
-
-                return NoContent();
+                return BadRequest("test2" );
+                return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the auction item." });
+                return StatusCode(500, ex.Message);
             }
         }
 

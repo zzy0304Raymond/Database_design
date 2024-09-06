@@ -31,17 +31,18 @@ namespace auctionapp.Controllers
             }
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email==loginDto.email);
+                var user = await _context.Users
+                    .Include(user => user.Admins)
+                    .FirstOrDefaultAsync(u => u.Email==loginDto.email);
                 if (user == null)
                 {
                     return BadRequest(new { message = "Illegal email!" });
                 }
-                Console.WriteLine(user.Userid);                
-                //else if (user.Admins.Count == 0)
-                //{
-                //    return BadRequest(new { message = " Not Admin Permission!" });
-                //}
-                //else
+                else if (user.Admins.Count == 0)
+                {
+                    return BadRequest(new { message = " Not Admin Permission!" });
+                }
+                else
                 {
                     if (!VerifyPassword(loginDto.password, user.Password))
                     {
