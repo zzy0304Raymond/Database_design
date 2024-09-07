@@ -48,7 +48,7 @@ namespace auctionapp.Controllers
                     startingBid = item.Startingprice,
                     description = item.Description,
                     condition = "New", // 
-                    details = "item.Feedbackpublishes.FirstOrDefault().Feedback.Content",
+                    details = item.Description,
                     stock = item.Users.Count, //
                     category = item.Category // 
                     //recommendedItems = item.Auctions.Select(a => new
