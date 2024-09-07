@@ -114,7 +114,7 @@ namespace auctionapp.Controllers
 
             try
             {
-                var max = _context.Users.Max(max => max.Userid);
+                var max = _context.Items.Max(max => max.Itemid);
                 var item = new Item
                 {
                     Itemid = max + 1,
@@ -122,21 +122,24 @@ namespace auctionapp.Controllers
                     Description = "", // Adjust this if a description is needed
                     Startingprice = newItem.StartingBid,
                     Postdate = DateTime.Now,
-                    Image = Convert.FromBase64String(newItem.ImageUrl)
+                    Image = Convert.FromBase64String(newItem.ImageUrl),
+                    Category = newItem.Category
                 };
+                _context.Items.Add(item);
+                await _context.SaveChangesAsync();
                 var auction = new Auction
                 {
-                    Auctionid = (_context.Auctions.Any() ? _context.Auctions.Max(m => m.Auctionid + 1) : 1),
+                    Auctionid = (_context.Auctions.Any() ? (_context.Auctions.Max(m => m.Auctionid ) + 1) : 1),
                     Itemid = item.Itemid,
                     Starttime = DateTime.Now,
-                    Endtime = newItem.EndTime,
+                    Endtime = DateTime.Parse(newItem.EndTime),
                     Currenthighestbid = newItem.StartingBid,
-                    Currenthighestbiduser = null,
-                    Currenthighestbiduserid = 0,
+                    Currenthighestbiduserid = 4,
                     Item= item
                 };
+                
 
-                _context.Items.Add(item);
+
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
 
@@ -318,7 +321,7 @@ namespace auctionapp.Controllers
     }
 
     // DTO class to match the API response format
-    public class AuctionItemDto
+    public class    AuctionItemDto
     {
         public decimal Id { get; set; }
         public string Name { get; set; }
@@ -334,7 +337,7 @@ namespace auctionapp.Controllers
         public string Name { get; set; }
         public decimal StartingBid { get; set; }
         public string Category { get; set; }
-        public DateTime EndTime { get; set; }
+        public string EndTime { get; set; }
         public string ImageUrl { get; set; }
     }
 
