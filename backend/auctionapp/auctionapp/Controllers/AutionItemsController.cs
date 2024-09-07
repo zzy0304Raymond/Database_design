@@ -254,39 +254,42 @@ namespace auctionapp.Controllers
             // 返回文件流（假设图片是 PNG 格式，可以根据实际格式调整）
             return File(item.Image, "image/png");
         }
-        //获取推荐物品列表
-        //[HttpGet("recommendations")]
-        //public async Task<IActionResult> GetRecommendedItems(string category)
-        //{
-        //    if (string.IsNullOrEmpty(category))
-        //    {
-        //        return BadRequest("Category parameter is required.");
-        //    }
-
-        //    try
-        //    {
-        //        var recommendedItems = await _context.Items
-        //            .Where(item => item.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
-        //            .Select(item => new
-        //            {
-        //                id = item.Itemid,
-        //                name = item.Itemname,
-        //                currentBid = item.Auctions.Any() ? item.Auctions.Max(a => a.Currenthighestbid) : (decimal?)null,
-        //                startingBid = item.Startingprice,
-        //                description = item.Description,
-        //                imageUrl = item.Image != null ? Convert.ToBase64String(item.Image) : null
-        //            })
-        //            .ToListAsync();
-
-        //        return Ok(recommendedItems);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"An error occurred: {ex.Message}");
-        //    }
-        //}
 
 
+        // GET: /api/auction-items/recommendations?category=<your_category>
+        [HttpGet("recommendations")]
+        public async Task<IActionResult> GetRecommendedItems([FromQuery] string category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                return BadRequest(new { message = "Category parameter is required." });
+            }
+
+            try
+            {
+                // 使用 ToLower() 或 ToUpper() 与数据库比较时忽略大小写
+                var recommendedItems = await _context.Items
+                    .Where(item => item.Category != null && item.Category.ToLower() == category.ToLower())
+                    .Select(item => new
+                    {
+                        id = item.Itemid,
+                        name = item.Itemname,
+                        price = item.Startingprice
+                    })
+                    .ToListAsync();
+
+                if (!recommendedItems.Any())
+                {
+                    return NotFound(new { message = "No items found in the specified category." });
+                }
+
+                return Ok(recommendedItems);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
+            }
+        }
 
         //获取出价记录
         [HttpGet("{Bidid}/bids")]
