@@ -10,7 +10,7 @@ import Inbox from '../components/Inbox.vue';
 import Chat from '../components/Chat.vue';  // 导入 Chat 组件
 import Payment from '../components/Payment.vue';
 import UserManual from '../components/UserManual.vue'; // 导入 UserManual 组件
-import SellItem from '../components/SellItem.vue'; // 导入 SellItem 组件
+// import SellItem from '../components/SellItem.vue'; // 导入 SellItem 组件
 import Brand from '../components/Brand.vue';  // 导入 Brand 组件
 
 
@@ -35,12 +35,12 @@ const routes = [
   { path: '/inbox', name: 'Inbox', component: Inbox },
   { path: '/chat', name: 'Chat', component: Chat },
   {
-    path: '/payment',
+    path: '/payment/:orderId',
     name: 'Payment',
     component: Payment,
     props: true, // 确保参数通过 props 传递到组件
   },
-  { path: '/sell', name: 'SellItem', component: SellItem }, // 添加卖出商品的路由
+  // { path: '/sell', name: 'SellItem', component: SellItem }, // 添加卖出商品的路由
   { path: '/manual', name: 'UserManual', component: UserManual }, // 添加使用手册的路由
   { path: '/brand', name: 'Brand', component: Brand }, // 添加品牌介绍的路由
 ];
@@ -51,6 +51,23 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach((to, from, next) => {
+//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+//   const requiresAdminAuth = to.matched.some(record => record.meta.requiresAdminAuth);
+
+//   if (requiresAuth) {
+//     const token = localStorage.getItem('authToken');
+//     if (!token) return next({ name: 'Login' });
+//   }
+
+//   if (requiresAdminAuth) {
+//     const adminToken = localStorage.getItem('adminToken');
+//     if (!adminToken) return next({ name: 'AdminLogin' }); // 重定向到 AdminLogin 页面
+//   }
+
+//   next();
+// });
+
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdminAuth = to.matched.some(record => record.meta.requiresAdminAuth);
@@ -60,12 +77,21 @@ router.beforeEach((to, from, next) => {
     if (!token) return next({ name: 'Login' });
   }
 
+  // 管理员身份验证
   if (requiresAdminAuth) {
-    const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) return next({ name: 'AdminLogin' }); // 重定向到 AdminLogin 页面
+    const isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn'); // 检查管理员登录状态
+    if (!isAdminLoggedIn) {
+      return next({ name: 'AdminLogin' }); // 未登录时跳转到管理员登录页
+    }
   }
 
-  next();
+  // 允许访问 AdminLogin 页面，即使管理员已经登录
+  if (to.name === 'AdminLogin') {
+    sessionStorage.removeItem('isAdminLoggedIn'); // 清除登录状态，允许重新登录其他管理员
+  }
+
+  next(); // 继续路由
 });
+
 
 export default router;

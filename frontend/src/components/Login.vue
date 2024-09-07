@@ -60,7 +60,7 @@ export default {
 
       try {
         // 发送 POST 请求到登录 API，提交用户的邮箱和密码
-        const response = await axios.post(`${BACKEND_BASE_URL}/login`, {
+        const response = await axios.post(`${BACKEND_BASE_URL}/user/login`, {
           email: this.form.email,
           password: this.form.password,
         });
@@ -71,9 +71,12 @@ export default {
         // 将 token 和用户 ID 存储到本地存储中
         localStorage.setItem('authToken', token);
         localStorage.setItem('userId', user.id);
+        localStorage.setItem('username', user.username); // 存储用户名
+        localStorage.setItem('userEmail', user.email); // 存储用户邮箱
+
 
         // 可选：将用户信息存储到 Vuex 以便全局访问（假设你在使用 Vuex）
-        this.$store.commit('setUser', user);
+        // this.$store.commit('setUser', user);
 
         // 登录成功后跳转到首页
         this.$router.push({ name: 'Home' });
@@ -102,12 +105,12 @@ export default {
 .login-page {
   display: flex;
   height: 100vh; /* 让页面高度全屏 */
-  flex-direction: row; /* 强制左右布局 */
+
   background-image: url('@/assets/images/background.jpg'); /* 使用上传的图片作为背景 */
   background-size: cover; /* 使背景图片覆盖整个区域 */
   background-position: center; /* 图片居中显示 */
   background-repeat: no-repeat; /* 防止图片重复 */
-  flex-wrap: nowrap; /* 防止内容换行 */
+
 }
 
 .left-section {

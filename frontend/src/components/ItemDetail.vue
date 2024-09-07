@@ -3,11 +3,7 @@
     <el-row :gutter="20">
       <!-- 左侧：商品图片 -->
       <el-col :span="16" class="image-section">
-        <el-carousel :interval="4000" arrow="always">
-          <el-carousel-item v-for="image in item.images" :key="image">
-            <img :src="image" alt="item.name" class="item-image" />
-          </el-carousel-item>
-        </el-carousel>
+        <img :src="getBase64Image(item.images)" alt="item.name" class="item-image" />
       </el-col>
 
       <!-- 右侧：商品信息和出价区域 -->
@@ -17,13 +13,17 @@
           Current Bid: US ${{ item.currentBid }} <br />
           Minimum Next Bid: US ${{ minimumNextBid }}
         </p>
+        <!-- 如果拍卖已结束，显示提示信息 -->
+        <el-alert v-if="isAuctionEnded" title="This auction has ended." type="warning"></el-alert>
         <div class="bid-section">
           <el-input-number v-model="bidAmount" :min="minimumNextBid" :step="bidIncrement" label="Your Bid" />
         </div>
         <div class="button-group">
-          <el-button type="primary" @click="bidNow" class="bid-now-button">Bid Now</el-button>
+          <el-button type="primary" @click="bidNow" :disabled="isAuctionEnded" class="bid-now-button">
+            Bid Now
+          </el-button>
           <el-button type="default" @click="addToCart" class="add-to-cart-button">Add to Cart</el-button>
-          <el-button type="default" @click="addToWishlist" class="add-to-watchlist-button">Add to Watchlist</el-button>
+          <!-- <el-button type="default" @click="addToWishlist" class="add-to-watchlist-button">Add to Watchlist</el-button> -->
         </div>
         <p class="item-description">{{ item.description }}</p>
 
@@ -43,11 +43,11 @@
         <h2>Product Details</h2>
         <p>{{ item.details }}</p>
       </div>
-      <!-- 聊天功能按钮 -->
-      <el-button type="primary" @click="goToChat" class="chat-button">Chat with Seller</el-button>
+      <!-- 聊天功能按钮
+      <el-button type="primary" @click="goToChat" class="chat-button">Chat with Seller</el-button> -->
     </div>
 
-    <!-- 聊天窗口 -->
+    <!-- 聊天窗口
     <el-dialog title="Chat with Seller" :visible.sync="chatVisible" width="50%">
       <el-input type="textarea" v-model="chatMessage" placeholder="Type your message here..."
         class="chat-input"></el-input>
@@ -55,7 +55,7 @@
         <el-button @click="chatVisible = false">Cancel</el-button>
         <el-button type="primary" @click="sendMessage">Send</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
 
     <div class="recommendations-section">
       <h2>猜你喜欢</h2>
@@ -87,7 +87,7 @@ export default {
         images: [],
         name: '',
         currentBid: 0,
-        startingBid: 0,
+        startingBid: 0, // 确保起拍价从后端读取
         description: '',
         condition: '',
         details: '',
@@ -98,86 +98,168 @@ export default {
       bidAmount: 0,
       bidIncrement: 5,
       bids: [],
-      recommendedItems: [],
-      chatVisible: false,
-      chatMessage: '',
-      isLoading: true,
-      error: null,
+      // recommendedItems: [],
+      // chatVisible: false,
+      // chatMessage: '',
+      isLoading: true, // 添加加载状态
+      error: null, // 添加错误处理
     };
   },
   computed: {
+      // 判断拍卖是否已经结束
+    isAuctionEnded() {
+      const currentTime = new Date();
+      return currentTime > new Date(this.item.endTime);
+    },
+    // 根据当前出价或起拍价计算最小下一次出价
     minimumNextBid() {
       return this.item.currentBid > 0
         ? this.item.currentBid + this.bidIncrement
-        : this.item.startingBid;
+        : this.item.startingBid;  // 使用起拍价作为初始出价
     },
   },
+  mounted() {
+    this.checkAuctionStatus();
+    setInterval(this.checkAuctionStatus, 600); // 每检查一次
+  },
   created() {
+    // 页面创建时获取拍卖物品详细信息
     this.fetchItemDetails();
   },
   methods: {
+    getBase64Image(image) {
+      // 这里假设后端的图片是jpeg格式
+      return `data:image/jpeg;base64,${image}`;
+    },
+    checkAuctionStatus() {
+      if (this.isAuctionEnded) {
+        this.$message.warning('This auction has ended.');
+      }
+    },
+    // 获取拍卖物品详细信息
     async fetchItemDetails() {
       const itemId = this.$route.params.id;
-      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}`)
-        .then(response => {
-          this.item = response.data;
-          this.bidAmount = this.minimumNextBid; // 设置默认出价为最小下一次出价
-        })
-        .catch(error => {
-          console.error('Error fetching item details:', error);
-        });
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}`);
+        this.item = response.data;
+
+        console.log('Fetched item details:', this.item.id);  // 确保 item 中有 itemId
+
+        // 设置默认出价为最小下一次出价
+        this.bidAmount = this.minimumNextBid;
+      } catch (error) {
+        console.error('Error fetching item details:', error);
+        this.error = 'Failed to fetch item details. Please try again later.';
+      } finally {
+        this.isLoading = false;
+      }
     },
-    fetchRecommendations() {
+    
+    // 获取推荐物品
+    async fetchRecommendations() {
       const category = this.item.category;
-      axios.get(`${BACKEND_BASE_URL}/auction-items/recommendations?category=${category}`)
-        .then(response => {
-          this.recommendedItems = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching recommendations:', error);
+      this.error = null;
+
+      try {
+        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items/recommendations`, {
+          params: { category }
         });
+        this.recommendedItems = response.data;
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        this.error = 'Failed to fetch recommendations.';
+      }
     },
-    viewItem(id) {
-      this.$router.push({ name: 'ItemDetail', params: { id } });
-    },
-    fetchBidHistory() {
+
+    // 获取出价历史
+    async fetchBidHistory() {
       const itemId = this.$route.params.id;
-      axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}/bids`)
-        .then(response => {
-          this.bids = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching bid history:', error);
-        });
+      this.error = null;
+
+      try {
+        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items/${itemId}/bids`);
+        this.bids = response.data;
+      } catch (error) {
+        console.error('Error fetching bid history:', error);
+        this.error = 'Failed to fetch bid history.';
+      }
     },
-    bidNow() {
+
+    // // 出价逻辑
+    // bidNow() {
+    //   if (this.bidAmount < this.minimumNextBid) {
+    //     this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
+    //     return;
+    //   }
+    //   // 跳转到支付页面
+    //   this.$router.push({
+    //     name: 'Payment',
+    //     params: {
+    //       itemName: this.item.name,
+    //       amount: this.bidAmount,
+    //       quantity: this.quantity
+    //     }
+    //   });
+    // },
+    async bidNow() {
       if (this.bidAmount < this.minimumNextBid) {
         this.$message.error(`Your bid must be at least US $${this.minimumNextBid}`);
         return;
       }
-      // 传递出价金额和数量到支付页面
-      this.$router.push({
-        name: 'Payment',
-        params: {
-          itemName: this.item.name,
-          amount: this.bidAmount,
-          quantity: this.quantity
-        }
-      });
+
+      const bidData = {
+        itemId: this.item.id, // 当前物品ID
+        userId: localStorage.getItem('userId'), // 数据库中的 USERID，获取用户ID
+        bidAmount: this.bidAmount, // 数据库中的 BIDAMOUNT，出价金额
+        bidTime: new Date().toISOString(), // 数据库中的 BIDTIME，出价时间
+      };
+
+        // 打印 bidData 检查 itemId 是否正确
+      console.log('Bid data being sent:', bidData);
+
+      try {
+        // 向后端发送POST请求保存出价记录
+        await axios.post(`${BACKEND_BASE_URL}/bid`, bidData);
+        this.$message.success('Your bid has been placed successfully!');
+        // 刷新出价历史以显示最新出价
+        this.fetchBidHistory();
+
+      } catch (error) {
+        console.error('Error placing bid:', error);
+        this.$message.error('Failed to place bid. Please try again.');
+      }
     },
-    // 添加到购物车
-    addToCart() {
-      // 实现添加到购物车的逻辑
-      this.$message.success('Added to cart!');
+  
+    // // 添加到购物车
+    // addToCart() {
+    //   this.$message.success('Added to cart!');
+    // },
+    // 添加商品到购物车
+    async addToCart() {
+      const userId = localStorage.getItem('userId');
+      try {
+        await axios.post(`${BACKEND_BASE_URL}/user/users/${userId}/cart/${this.item.id}`);
+        // await axios.delete(`${BACKEND_BASE_URL}/user/users/${userId}/cart/${item.itemId}`);
+        this.$message.success('Added to cart!');
+      } catch (error) {
+        console.error('Error adding item to cart:', error);
+        this.$message.error('Failed to add item to cart');
+      }
     },
-    // 添加到愿望清单
-    addToWishlist() {
-      // 实现添加到愿望清单的逻辑
-      this.$message.success('Added to watchlist!');
-    },
-    goToChat() {
-      this.$router.push('/chat');  // 跳转到聊天页面
-    },
+    // // 添加到愿望清单
+    // addToWishlist() {
+    //   this.$message.success('Added to watchlist!');
+    // },
+
+    // // 进入聊天页面
+    // goToChat() {
+    //   this.$router.push('/chat');
+    // },
+
+    // 查看物品详情
     viewItem(id) {
       this.$router.push({ name: 'ItemDetail', params: { id } });
     }
@@ -335,7 +417,7 @@ export default {
   color: #7f8c8d;
 }
 
-/* 聊天按钮样式 */
+/* 聊天按钮样式
 .chat-button {
   flex-shrink: 0;
   padding: 15px 20px;
@@ -348,7 +430,7 @@ export default {
 
 .chat-button:hover {
   background-color: #e68a00;
-}
+} */
 
 /* 新增的“猜你喜欢”样式 */
 .recommendations-section {
@@ -369,5 +451,12 @@ export default {
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 10px;
+}
+
+.item-image {
+  width: 300px; /* 设置图片的固定宽度 */
+  height: 300px; /* 设置图片的固定高度 */
+  object-fit: cover; /* 保证图片填充整个容器，保持比例且不会变形 */
+  border-radius: 10px; /* 可选：给图片加上圆角 */
 }
 </style>

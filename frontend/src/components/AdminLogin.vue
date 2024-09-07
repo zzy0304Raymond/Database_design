@@ -28,6 +28,53 @@
   </div>
 </template>
 
+<!-- <script>
+import axios from 'axios'; // 引入 axios 用于发送 HTTP 请求
+
+const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL; -->
+
+// export default {
+//   name: 'AdminLogin',
+//   data() {
+//     return {
+//       form: {
+//         email: '',
+//         password: '',
+//       },
+//       isLoggingIn: false,
+//     };
+//   },
+//   methods: {
+//     resetForm() {
+//       this.$refs.form.resetFields(); // 仍然保留表单重置功能
+//     },
+//     // 表单提交方法，不再进行验证
+//     submitForm() {
+//       this.login(); // 直接调用 login 方法，不进行表单验证
+//     },
+//     // 登录方法，向服务器发送登录请求
+//     login() {
+//       this.isLoggingIn = true;
+//       axios.post(`${BACKEND_BASE_URL}/admin/login`, {
+//         email: this.form.email, // 提交邮箱
+//         password: this.form.password, // 提交密码
+//       })
+//         .then(response => {
+//           localStorage.setItem('adminToken', response.data.token);
+//           // 登录成功后跳转到管理员页面
+//           this.$router.push({ name: 'Admin' });
+//         })
+//         .catch(error => {
+//           console.error('Error logging in:', error); // 如果登录失败，打印错误信息
+//         })
+//         .finally(() => {
+//           this.isLoggingIn = false;
+//         });
+//     },
+//   },
+// };
+<!-- // </script> -->
+
 <script>
 import axios from 'axios'; // 引入 axios 用于发送 HTTP 请求
 
@@ -41,47 +88,52 @@ export default {
         email: '',
         password: '',
       },
-      isLoggingIn: false,
+      isLoggingIn: false, // 控制登录状态
     };
   },
   methods: {
     resetForm() {
-      this.$refs.form.resetFields();
+      this.$refs.form.resetFields(); // 保留表单重置功能
     },
-    // 表单提交方法，首先进行表单验证
+
+    // 提交表单方法，调用 login 方法进行登录
     submitForm() {
-      this.$refs.form.validate((valid) => { // 使用 ref 进行表单验证
-        if (valid) {
-          this.login(); // 如果验证通过，调用 login 方法
-        } else {
-          console.log('error submit!!'); // 如果验证失败，输出错误信息
-          this.resetForm();
-          return false;// 阻止提交
-        }
-      });
+      this.login(); 
     },
+
     // 登录方法，向服务器发送登录请求
-    login() {
+    async login() {
       this.isLoggingIn = true;
-      axios.post(`${BACKEND_BASE_URL}/admin/login`, { // 使用 axios 发送 POST 请求
-        email: this.form.email, // 提交邮箱
-        password: this.form.password, // 提交密码
-      })
-        .then(response => {
-          localStorage.setItem('adminToken', response.data.token);
-          // 登录成功后跳转到管理员页面
-          this.$router.push({ name: 'Admin' });
-        })
-        .catch(error => {
-          console.error('Error logging in:', error); // 如果登录失败，打印错误信息
-        })
-        .finally(() => {
-          this.isLoggingIn = false;
+      try {
+        const response = await axios.post(`${BACKEND_BASE_URL}/admin/login`, {
+          email: this.form.email, // 提交邮箱
+          password: this.form.password, // 提交密码
         });
+
+        // 如果登录成功，后端会返回成功的 message
+        if (response.status === 200) {
+          // 设置管理员登录状态
+          sessionStorage.setItem('isAdminLoggedIn', 'true');
+          
+          this.$message.success('Login successfully'); // 显示登录成功的提示
+          this.$router.push({ name: 'Admin' }); // 跳转到管理员页面
+        } else {
+          // 如果后端返回其他信息，处理错误提示
+          this.$message.error(response.data.message || 'Login failed');
+        }
+      } catch (error) {
+        // 处理请求过程中可能发生的错误
+        console.error('Error logging in:', error);
+        this.$message.error('An error occurred during login. Please try again.');
+      } finally {
+        this.isLoggingIn = false; // 登录结束，解除加载状态
+      }
     },
   },
 };
 </script>
+
+
 
 <style scoped>
 .admin-login {

@@ -6,31 +6,33 @@
     <div class="discount-section">
       <h2>今日特惠</h2>
       <el-carousel :interval="4000" arrow="always">
-        <el-carousel-item v-for="item in discountItems" :key="item.id">
-          <div class="discount-item">
-            <img :src="item.image" alt="折扣商品" />
-            <h3>{{ item.title }}</h3>
-            <p>优惠价: {{ item.price }}</p>
-          </div>
+        <el-carousel-item v-for="(image, index) in localImages" :key="index">
+          <div class="carousel-background" :style="{ backgroundImage: `url(${image})` }"></div>
         </el-carousel-item>
       </el-carousel>
     </div>
 
+
     <!-- 搜索栏和过滤器 -->
     <div class="search-filter-bar">
-      <el-input v-model="searchQuery" placeholder="Search items..." class="search-bar" clearable>
+      <!-- 将 v-model 改为 searchQueryInput，这里用于暂存用户输入 -->
+      <el-input v-model="searchQueryInput" placeholder="Search items..." class="search-bar" clearable>
         <template #append>
+          <!-- 点击搜索按钮时触发 searchItems 方法 -->
           <el-button icon="el-icon-search" @click="searchItems">Search</el-button>
         </template>
       </el-input>
-      <el-select v-model="selectedCategory" placeholder="Select Category" @change="filterByCategory" class="filter-bar">
+      
+      <!-- 分类过滤器 -->
+      <el-select v-model="selectedCategory" placeholder="Select Category" class="filter-bar">
         <el-option label="All Categories" value=""></el-option>
-        <el-option label="Antiques" value="Antiques"></el-option>
-        <el-option label="Art" value="Art"></el-option>
-        <el-option label="Electronics" value="Electronics"></el-option>
-        <el-option label="Jewelry" value="Jewelry"></el-option>
+        <el-option label="painting" value="painting"></el-option>
+        <el-option label="jewlry" value="jewlry"></el-option>
+        <el-option label="watch" value="watch"></el-option>
+        <el-option label="antique" value="antique"></el-option>
       </el-select>
     </div>
+
 
 
 
@@ -61,6 +63,8 @@
       <el-button type="primary" @click="learnMore">了解更多</el-button>
     </div>
 
+    <!-- 新增按钮，前往大厅聊天系统 -->
+    <el-button type="success" @click="goToChat">前往大厅聊天系统</el-button>
 
   </div>
 </template>
@@ -70,30 +74,60 @@ import axios from 'axios';
 
 const BACKEND_BASE_URL = import.meta.env.VITE_API_BACKEND_BASE_URL;
 
+import image1 from '@/assets/images/image1.jpg';
+import image2 from '@/assets/images/image2.jpg';
+import image3 from '@/assets/images/image3.jpg';
+
 export default {
   name: 'Home',
   data() {
     return {
+      localImages: [
+        image1,  // 使用导入的图片
+        image2,
+        image3,
+      ],
       auctionItems: [],
+      searchQueryInput: '',  // 存储用户输入的搜索关键字
       searchQuery: '',
       selectedCategory: '',
       currentPage: 1,
       itemsPerPage: 6,
       searchResults: [],
-      discountItems: [],
     };
   },
+  watch: {
+    selectedCategory() {
+      console.log('Category changed:', this.selectedCategory);  // 调试分类选择变化
+      this.currentPage = 1; // 当分类改变时重置分页
+    },
+  },
+
   computed: {
     filteredItems() {
-      if (this.searchResults.length > 0) {
-        return this.searchResults;
-      } else {
-        let items = this.auctionItems;
-        if (this.selectedCategory) {
-          items = items.filter(item => item.category === this.selectedCategory);
-        }
-        return items;
+      let items = this.auctionItems;
+
+      // 输出所有物品列表进行调试
+      console.log('All auction items:', items);
+
+      // 搜索关键字过滤
+      if (this.searchQuery) {
+        console.log('Filtering by search query:', this.searchQuery);  // 调试搜索关键字
+        items = items.filter(item => 
+          item.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
       }
+
+      // 分类过滤，确保当选择 "All Categories" 时不过滤
+      if (this.selectedCategory && this.selectedCategory !== '') {
+        console.log('Filtering by category:', this.selectedCategory);  // 调试分类过滤
+        items = items.filter(item => 
+          item.category.toLowerCase() === this.selectedCategory.toLowerCase()
+        );
+      }
+
+      console.log('Filtered items:', items);  // 输出过滤后的物品列表
+      return items;  // 返回最终过滤后的结果
     },
     paginatedItems() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -105,49 +139,54 @@ export default {
   methods: {
     async fetchAuctionItems() {
       try {
-        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items`, {
-          params: {
-            searchQuery: this.searchQuery,
-            category: this.selectedCategory,
-          }
-        });
-        this.auctionItems = response.data.items;
+        const response = await axios.get(`${BACKEND_BASE_URL}/auction-items`);
+        this.auctionItems = response.data;  // 这里接收的是返回的物品列表
+        console.log('Fetched auction items:', this.auctionItems);  // 调试获取的拍卖物品
       } catch (error) {
         console.error('Error fetching auction items:', error);
       }
     },
     async fetchDiscountItems() {
       try {
-        const response = await axios.get(`${BACKEND_BASE_URL}/discount-items`);
+        // const response = await axios.get(`${BACKEND_BASE_URL}/discount-items`);
         this.discountItems = response.data.items;
       } catch (error) {
         console.error('Error fetching discount items:', error);
       }
     },
     viewItem(id) {
+      console.log('Viewing item with ID:', id);  // 调试查看物品详情
       this.$router.push({ name: 'ItemDetail', params: { id } });
     },
+    // async searchItems() {
+    //   try {
+    //     const response = await axios.get(`${BACKEND_BASE_URL}/search-items`, {
+    //       params: { query: this.searchQuery }
+    //     });
+    //     this.searchResults = response.data.items;
+    //     this.currentPage = 1; // 重置分页
+    //   } catch (error) {
+    //     console.error('Error searching items:', error);
+    //     this.searchResults = [];
+    //   }
+    // },
+    // async filterByCategory() {
+    //   await this.fetchAuctionItems();
+    // },
     async searchItems() {
-      try {
-        const response = await axios.get(`${BACKEND_BASE_URL}/search-items`, {
-          params: { query: this.searchQuery }
-        });
-        this.searchResults = response.data.items;
-        this.currentPage = 1; // 重置分页
-      } catch (error) {
-        console.error('Error searching items:', error);
-        this.searchResults = [];
-      }
-    },
-    async filterByCategory() {
-      await this.fetchAuctionItems();
+      this.searchQuery = this.searchQueryInput;  // 将输入框的内容赋值给 searchQuery
+      this.currentPage = 1; // 重置分页
     },
     handlePageChange(val) {
       this.currentPage = val;
-      this.fetchAuctionItems();
+      // this.fetchAuctionItems();
+      console.log('Page changed to:', this.currentPage);  // 调试页码变化
     },
     learnMore() {
       this.$router.push('/brand');
+    },
+    goToChat() {
+      this.$router.push('/chat');  // 假设聊天系统路由是 "/chat"
     },
   },
   mounted() {
@@ -292,34 +331,41 @@ export default {
   /* 居中对齐 */
 }
 
+.discount-image {
+  width: 100%; /* 让图片自适应宽度 */
+  height: 500px; 
+  /* 固定图片高度 */
+  object-fit: cover; /* 保持图片的宽高比，剪裁溢出的部分 */
+  border-radius: 8px; /* 可选：给图片加上圆角 */
+}
+
 .discount-section {
-  width: 100vw;
-  /* 全屏宽度 */
+  width: 100%;
   margin: 20px 0;
   padding: 20px 0;
   background-color: #fff;
   text-align: center;
-  overflow: hidden;
-  /* 防止超出内容 */
 }
 
-.discount-item {
-  padding: 10px;
+.el-carousel {
+  height: 300px; /* 轮播图组件的高度与图片相匹配 */
+  margin: 0 auto;
+  background-position: center;
+  background-size: contain;
+}
+
+.carousel-background {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  transition: transform 0.3s ease; /* 折扣商品的悬停动画 */
-}
-
-.discount-item:hover {
-  transform: scale(1.05); /* 悬停时轻微放大 */
-}
-
-.discount-item img {
-  width: auto;
-  height: 150px;
-  /* 图片高度 */
-  border-radius: 8px;
+  width: 70%; /* 让背景图片适应宽度 */
+  height: 300px; /* 设置轮播图的高度 */
+  background-size: cover; /* 保证图片不会被裁剪，适应容器 */
+  background-position: center; /* 图片居中显示 */
+  background-repeat: no-repeat; /* 禁止背景图片重复 */
+  border-radius: 8px; /* 可选：给背景图片加上圆角 */
+  overflow: visible; /* 显示超出容器的部分 */
+  padding-left: 500px; /* 左侧内边距 */
 }
 
 .brand-intro {

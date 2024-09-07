@@ -63,7 +63,7 @@ export default {
         name: '',
         startingBid: null,
         category: '',
-        description: '',
+        postTime: '',
         images: [],
       },
       dialogImageUrl: '',
