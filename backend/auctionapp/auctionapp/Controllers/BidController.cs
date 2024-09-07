@@ -49,7 +49,7 @@ namespace auctionapp.Controllers
 
                 var userBid = new Bidrecord
                 {
-                    Bidid = auction.Bidrecords.Max(a => a.Bidid) + 1 ,
+                    Bidid = _context.Bidrecords.Any() ? _context.Bidrecords.Max(a => a.Bidid) + 1 : 1 ,
                     Auctionid = auction.Auctionid,
                     Userid = bidData.userId,
                     Bidamount = bidData.bidAmount,
@@ -57,6 +57,7 @@ namespace auctionapp.Controllers
                     Auction = auction,
                     User = await _context.Users.FindAsync(bidData.userId)
                 };
+
 
                 _context.Bidrecords.AddAsync(userBid);
                 await _context.SaveChangesAsync();

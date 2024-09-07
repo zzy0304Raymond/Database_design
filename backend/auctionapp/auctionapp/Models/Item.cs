@@ -19,6 +19,8 @@ public partial class Item
 
     public string? Category { get; set; }
 
+    public bool? Valid { get; set; }
+
     public virtual ICollection<Auction> Auctions { get; set; } = new List<Auction>();
 
     public virtual ICollection<Feedbackpublish> Feedbackpublishes { get; set; } = new List<Feedbackpublish>();
