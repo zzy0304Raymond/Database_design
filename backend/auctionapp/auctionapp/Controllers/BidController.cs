@@ -40,7 +40,7 @@ namespace auctionapp.Controllers
             {
                 var auction = await _context.Auctions
                     .Include(auction => auction.Bidrecords)
-                    .FirstOrDefaultAsync(auction => auction.Auctionid == bidData.auctionId);
+                    .FirstOrDefaultAsync(auction => auction.Itemid == bidData.itemId);
 
                 if (auction == null)
                 {
@@ -78,7 +78,7 @@ namespace auctionapp.Controllers
 
         public class bidDataDto
         {
-            public decimal auctionId { get; set; }
+            public decimal itemId { get; set; }
 
             public decimal userId { get; set; }
 
