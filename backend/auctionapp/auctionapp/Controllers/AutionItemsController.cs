@@ -75,6 +75,9 @@ namespace auctionapp.Controllers
             }
         }
 
+
+
+
         //获取拍卖列表
         // GET: api/auction-items
         [HttpGet]
@@ -125,7 +128,8 @@ namespace auctionapp.Controllers
                     Startingprice = newItem.StartingBid,
                     Postdate = DateTime.Now,
                     Image = Convert.FromBase64String(newItem.ImageUrl),
-                    Category = newItem.Category
+                    Category = newItem.Category,
+                    Valid = true
                 };
                 _context.Items.Add(item);
                 await _context.SaveChangesAsync();
@@ -206,6 +210,53 @@ namespace auctionapp.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        //轮询
+        //Get; api/auction-items/confirm
+        [HttpGet("confirm")]
+        public async Task<ActionResult<DelDto>> comfirmDel()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Bad!" });
+            }
+
+            try
+            {
+                var validItems = await _context.Items
+                        .Include( item =>  item.Auctions)
+                        .Where(item => item.Valid == true)
+                        .ToListAsync();
+
+                var firstValidItemId = validItems
+                    .Where(item => item.Auctions.Any(auction => auction.Endtime < DateTime.Now))
+                    .Select(item => item.Itemid);
+
+                if (firstValidItemId.Any())
+                {
+                    var Dto = new DelDto
+                    {
+                        itemId = firstValidItemId.FirstOrDefault()
+                    };
+                    return Ok(Dto);
+                }
+                else
+                {
+                    var Dto = new DelDto
+                    {
+                        itemId = -1
+                    };
+                    return Ok(Dto);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
 
         //删除拍卖物品
         // DELETE: api/auction-items/{id}
@@ -348,6 +399,9 @@ namespace auctionapp.Controllers
         public string ImageUrl { get; set; }
     }
 
-
+    public class DelDto
+    {
+        public decimal itemId { get; set; }
+    }
 
 }
