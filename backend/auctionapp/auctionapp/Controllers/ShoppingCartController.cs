@@ -40,6 +40,43 @@ namespace auctionapp.Controllers
             return Ok(cartItems);
         }
 
+        // POST: /user/users/{userId}/cart/{itemId}
+        [HttpPost("users/{userId}/cart/{itemId}")]
+        public async Task<ActionResult> AddToCart(decimal userId, decimal itemId)
+        {
+            // 查找指定 ID 的用户
+            var user = await _context.Users
+                .Include(u => u.ItemsNavigation) // 加载购物车中的物品
+                .FirstOrDefaultAsync(u => u.Userid == userId);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // 查找指定 ID 的物品
+            var item = await _context.Items.FindAsync(itemId);
+
+            if (item == null)
+            {
+                return NotFound(new { message = "Item not found." });
+            }
+
+            // 检查物品是否已经在购物车中
+            if (user.ItemsNavigation.Any(i => i.Itemid == itemId))
+            {
+                return BadRequest(new { message = "Item already in cart." });
+            }
+
+            // 将物品添加到购物车
+            user.ItemsNavigation.Add(item);
+
+            // 保存更改
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
         // DELETE: /user/users/{userId}/cart/{itemId}
         [HttpDelete("users/{userId}/cart/{itemId}")]
         public async Task<ActionResult> RemoveCartItem(decimal userId, decimal itemId)
