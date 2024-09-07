@@ -35,5 +35,7 @@ public partial class User
 
     public virtual ICollection<Item> Items { get; set; } = new List<Item>();
 
+    public virtual ICollection<Item> ItemsNavigation { get; set; } = new List<Item>();
+
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }
