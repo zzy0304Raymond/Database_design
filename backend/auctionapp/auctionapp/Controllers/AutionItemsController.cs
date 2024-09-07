@@ -97,7 +97,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching auction items." });
+                return StatusCode(500, ex.Message);
             }
         }
 
