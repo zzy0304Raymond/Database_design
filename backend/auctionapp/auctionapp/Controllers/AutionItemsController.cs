@@ -347,22 +347,17 @@ namespace auctionapp.Controllers
         }
 
         //获取出价记录
-        [HttpGet("{Bidid}/bids")]
-        public async Task<IActionResult> GetBidHistory(decimal bidId)
+        [HttpGet("{itemId}/bids")]
+        public async Task<IActionResult> GetBidHistory(decimal itemId)
         {
-            if (bidId <= 0)
-            {
-                return BadRequest("Item ID parameter is required.");
-            }
 
             try
             {
                 // 确保 itemId 与 Bidrecord 中的字段类型匹配，这里假设是 string 类型
-                var bidHistory = await _context.Bidrecords
-                    .Where(record => record.Bidid == bidId)
+                var bidHistory = await _context.Bidrecords.Include(b=>b.Auction)
+                    .Where(record => record.Auction.Itemid == itemId)
                     .Select(record => new
                     {
-                        id = record.Bidid,
                         bidderId = record.Userid,
                         amount = record.Bidamount,
                         timestamp = record.Bidtime.Value.ToString("o") // ISO 8601 格式
