@@ -49,7 +49,7 @@ namespace auctionapp.Controllers
                     condition = "New", // 
                     details = "item.Feedbackpublishes.FirstOrDefault().Feedback.Content",
                     stock = item.Users.Count, //
-                    category = "General", // 
+                    category = item.Category // 
                     //recommendedItems = item.Auctions.Select(a => new
                     //{
                     //    auctionId = a.Auctionid,

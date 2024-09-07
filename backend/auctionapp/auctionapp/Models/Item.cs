@@ -17,9 +17,13 @@ public partial class Item
 
     public byte[]? Image { get; set; }
 
+    public string? Category { get; set; }
+
     public virtual ICollection<Auction> Auctions { get; set; } = new List<Auction>();
 
     public virtual ICollection<Feedbackpublish> Feedbackpublishes { get; set; } = new List<Feedbackpublish>();
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
+
+    public virtual ICollection<User> UsersNavigation { get; set; } = new List<User>();
 }

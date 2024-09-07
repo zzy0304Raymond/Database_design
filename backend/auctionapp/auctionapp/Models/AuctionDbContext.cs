@@ -213,6 +213,10 @@ public partial class AuctionDbContext : DbContext
             entity.Property(e => e.Itemid)
                 .HasColumnType("NUMBER")
                 .HasColumnName("ITEMID");
+            entity.Property(e => e.Category)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CATEGORY");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -246,6 +250,29 @@ public partial class AuctionDbContext : DbContext
                     {
                         j.HasKey("Itemid", "Userid").HasName("SYS_C008296");
                         j.ToTable("ITEMPUBLISH");
+                        j.IndexerProperty<decimal>("Itemid")
+                            .HasColumnType("NUMBER")
+                            .HasColumnName("ITEMID");
+                        j.IndexerProperty<decimal>("Userid")
+                            .HasColumnType("NUMBER")
+                            .HasColumnName("USERID");
+                    });
+
+            entity.HasMany(d => d.UsersNavigation).WithMany(p => p.ItemsNavigation)
+                .UsingEntity<Dictionary<string, object>>(
+                    "Shoppingcart",
+                    r => r.HasOne<User>().WithMany()
+                        .HasForeignKey("Userid")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("SYS_C008301"),
+                    l => l.HasOne<Item>().WithMany()
+                        .HasForeignKey("Itemid")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("SYS_C008300"),
+                    j =>
+                    {
+                        j.HasKey("Itemid", "Userid").HasName("SYS_C008299");
+                        j.ToTable("SHOPPINGCART");
                         j.IndexerProperty<decimal>("Itemid")
                             .HasColumnType("NUMBER")
                             .HasColumnName("ITEMID");
