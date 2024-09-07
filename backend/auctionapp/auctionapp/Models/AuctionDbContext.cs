@@ -21,6 +21,8 @@ public partial class AuctionDbContext : DbContext
 
     public virtual DbSet<Bidrecord> Bidrecords { get; set; }
 
+    public virtual DbSet<Chat> Chats { get; set; }
+
     public virtual DbSet<Feedback> Feedbacks { get; set; }
 
     public virtual DbSet<Feedbackpublish> Feedbackpublishes { get; set; }
@@ -150,6 +152,31 @@ public partial class AuctionDbContext : DbContext
                 .HasConstraintName("SYS_C008272");
         });
 
+        modelBuilder.Entity<Chat>(entity =>
+        {
+            entity.HasKey(e => e.Chatid).HasName("SYS_C008304");
+
+            entity.ToTable("CHAT");
+
+            entity.Property(e => e.Chatid)
+                .HasColumnType("NUMBER")
+                .HasColumnName("CHATID");
+            entity.Property(e => e.Chattime)
+                .HasColumnType("DATE")
+                .HasColumnName("CHATTIME");
+            entity.Property(e => e.Content)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("CONTENT");
+            entity.Property(e => e.Userid)
+                .HasColumnType("NUMBER")
+                .HasColumnName("USERID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Chats)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("SYS_C008305");
+        });
+
         modelBuilder.Entity<Feedback>(entity =>
         {
             entity.HasKey(e => e.Feedbackid).HasName("SYS_C008284");
@@ -234,6 +261,9 @@ public partial class AuctionDbContext : DbContext
             entity.Property(e => e.Startingprice)
                 .HasColumnType("NUMBER(10,2)")
                 .HasColumnName("STARTINGPRICE");
+            entity.Property(e => e.Valid)
+                .HasColumnType("NUMBER(1)")
+                .HasColumnName("VALID");
 
             entity.HasMany(d => d.Users).WithMany(p => p.Items)
                 .UsingEntity<Dictionary<string, object>>(

@@ -25,6 +25,8 @@ public partial class User
 
     public virtual ICollection<Bidrecord> Bidrecords { get; set; } = new List<Bidrecord>();
 
+    public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
+
     public virtual ICollection<Feedbackpublish> Feedbackpublishes { get; set; } = new List<Feedbackpublish>();
 
     public virtual ICollection<Transaction> TransactionBuyerusers { get; set; } = new List<Transaction>();

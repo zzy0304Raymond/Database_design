@@ -58,7 +58,6 @@ namespace auctionapp.Controllers
                     User = await _context.Users.FindAsync(bidData.userId)
                 };
 
-                System.Console.WriteLine(userBid.Bidid);
 
                 _context.Bidrecords.AddAsync(userBid);
                 await _context.SaveChangesAsync();

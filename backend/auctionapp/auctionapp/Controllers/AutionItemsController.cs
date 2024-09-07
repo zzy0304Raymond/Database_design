@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using auctionapp.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace auctionapp.Controllers
@@ -180,8 +181,9 @@ namespace auctionapp.Controllers
 
                 item.Itemname = updatedItem.Name;
                 item.Startingprice = updatedItem.StartingBid;
-                item.Postdate = DateTime.Now;
-                item.Image = updatedItem.ImageUrl != null ? Convert.FromBase64String(updatedItem.ImageUrl.Replace("data:image/png;base64,", "")) : null;
+                item.Image = Convert.FromBase64String(updatedItem.ImageUrl);
+                item.Category = updatedItem.Category;
+
 
                 _context.Entry(item).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
@@ -193,7 +195,7 @@ namespace auctionapp.Controllers
                     StartingBid = item.Startingprice ?? 0,
                     Category = updatedItem.Category,
                     PostTime = item.Postdate.ToString(),
-                    ImageUrl = updatedItem.ImageUrl
+                    ImageUrl = null
                 };
 
                 return Ok(updatedResponse);
@@ -217,7 +219,7 @@ namespace auctionapp.Controllers
                     return NotFound(new { message = "Auction item not found." });
                 }
 
-                _context.Items.Remove(item);
+                item.Valid = false;
 
                 await _context.SaveChangesAsync();
                 return Ok();
