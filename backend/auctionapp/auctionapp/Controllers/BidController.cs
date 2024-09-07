@@ -49,7 +49,7 @@ namespace auctionapp.Controllers
 
                 var userBid = new Bidrecord
                 {
-                    Bidid = auction.Bidrecords.Any() ? auction.Bidrecords.Max(a => a.Bidid) + 1 : 1,
+                    Bidid = auction.Bidrecords.Max(a => a.Bidid) + 1 ,
                     Auctionid = auction.Auctionid,
                     Userid = bidData.userId,
                     Bidamount = bidData.bidAmount,
