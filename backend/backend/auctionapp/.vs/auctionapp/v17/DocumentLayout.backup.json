@@ -22,21 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AutionItemsController.cs",
-              "DocumentMoniker": "D:\\\u6570\u636E\u5E93\u6691\u671F\u9879\u76EE\\Database_design\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "RelativeDocumentMoniker": "..\\..\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "ToolTip": "D:\\\u6570\u636E\u5E93\u6691\u671F\u9879\u76EE\\Database_design\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "RelativeToolTip": "..\\..\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAB0AAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-06T13:04:47.534Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -52,6 +39,30 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AutionItemsController.cs",
+              "DocumentMoniker": "C:\\Users\\23563\\AppData\\Local\\SourceServer\\cd91d85f603b4d969eb7b195df5e38385360a0e3b5b3ca09a9a5a2f060257e55\\backend\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "ToolTip": "C:\\Users\\23563\\AppData\\Local\\SourceServer\\cd91d85f603b4d969eb7b195df5e38385360a0e3b5b3ca09a9a5a2f060257e55\\backend\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAB0AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-06T12:47:34.424Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AutionItemsController.cs",
+              "DocumentMoniker": "D:\\\u6570\u636E\u5E93\u6691\u671F\u9879\u76EE\\Database_design\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "RelativeDocumentMoniker": "..\\..\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "ToolTip": "D:\\\u6570\u636E\u5E93\u6691\u671F\u9879\u76EE\\Database_design\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "RelativeToolTip": "..\\..\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAB0AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-06T13:04:47.534Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
               "Title": "AdminController.cs",
               "DocumentMoniker": "D:\\\u6570\u636E\u5E93\u6691\u671F\u9879\u76EE\\Database_design\\backend\\auctionapp\\auctionapp\\Controllers\\AdminController.cs",
@@ -61,17 +72,6 @@
               "ViewState": "AgIAABUAAAAAAAAAAADwvyMAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-06T13:00:21.396Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AutionItemsController.cs",
-              "DocumentMoniker": "C:\\Users\\23563\\AppData\\Local\\SourceServer\\cd91d85f603b4d969eb7b195df5e38385360a0e3b5b3ca09a9a5a2f060257e55\\backend\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "ToolTip": "C:\\Users\\23563\\AppData\\Local\\SourceServer\\cd91d85f603b4d969eb7b195df5e38385360a0e3b5b3ca09a9a5a2f060257e55\\backend\\backend\\auctionapp\\auctionapp\\Controllers\\AutionItemsController.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAB0AAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-06T12:47:34.424Z",
               "EditorCaption": ""
             }
           ]
