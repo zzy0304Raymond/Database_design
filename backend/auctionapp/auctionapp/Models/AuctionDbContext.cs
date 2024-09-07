@@ -97,7 +97,7 @@ public partial class AuctionDbContext : DbContext
                 .HasColumnType("NUMBER")
                 .HasColumnName("AUCTIONID");
             entity.Property(e => e.Currenthighestbid)
-                .HasColumnType("NUMBER(10,2)")
+                .HasColumnType("NUMBER(20,2)")
                 .HasColumnName("CURRENTHIGHESTBID");
             entity.Property(e => e.Currenthighestbiduserid)
                 .HasColumnType("NUMBER")
@@ -259,7 +259,7 @@ public partial class AuctionDbContext : DbContext
                 .HasColumnType("DATE")
                 .HasColumnName("POSTDATE");
             entity.Property(e => e.Startingprice)
-                .HasColumnType("NUMBER(10,2)")
+                .HasColumnType("NUMBER(20,2)")
                 .HasColumnName("STARTINGPRICE");
             entity.Property(e => e.Valid)
                 .HasColumnType("NUMBER(1)")
@@ -367,7 +367,7 @@ public partial class AuctionDbContext : DbContext
                 .HasColumnType("NUMBER")
                 .HasColumnName("PAYMENTID");
             entity.Property(e => e.Amount)
-                .HasColumnType("NUMBER(10,2)")
+                .HasColumnType("NUMBER(20,2)")
                 .HasColumnName("AMOUNT");
             entity.Property(e => e.Paymentmethod)
                 .HasMaxLength(50)
@@ -395,7 +395,7 @@ public partial class AuctionDbContext : DbContext
                 .HasColumnType("NUMBER")
                 .HasColumnName("REFUNDID");
             entity.Property(e => e.Refundamount)
-                .HasColumnType("NUMBER(10,2)")
+                .HasColumnType("NUMBER(20,2)")
                 .HasColumnName("REFUNDAMOUNT");
             entity.Property(e => e.Refundreason)
                 .HasMaxLength(100)
@@ -455,7 +455,7 @@ public partial class AuctionDbContext : DbContext
                 .HasColumnType("NUMBER")
                 .HasColumnName("TRANSACTIONID");
             entity.Property(e => e.Amount)
-                .HasColumnType("NUMBER(10,2)")
+                .HasColumnType("NUMBER(20,2)")
                 .HasColumnName("AMOUNT");
             entity.Property(e => e.Auctionid)
                 .HasColumnType("NUMBER")
@@ -519,10 +519,6 @@ public partial class AuctionDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("USERNAME");
-            entity.Property(e => e.Usertype)
-                .HasMaxLength(2)
-                .IsUnicode(false)
-                .HasColumnName("USERTYPE");
         });
 
         OnModelCreatingPartial(modelBuilder);

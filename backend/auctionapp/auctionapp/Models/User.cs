@@ -19,8 +19,6 @@ public partial class User
 
     public DateTime? Registrationdate { get; set; }
 
-    public string? Usertype { get; set; }
-
     public virtual ICollection<Auction> Auctions { get; set; } = new List<Auction>();
 
     public virtual ICollection<Bidrecord> Bidrecords { get; set; } = new List<Bidrecord>();
