@@ -83,6 +83,7 @@ namespace auctionapp.Controllers
             try
             {
                 var items = await _context.Items
+                    .Where(item => item.Valid == true)
                     .Select(item => new AuctionItemDto
                     {
                         Id = item.Itemid,
@@ -220,6 +221,8 @@ namespace auctionapp.Controllers
                 }
 
                 item.Valid = false;
+
+                _context.Items.Update(item);
 
                 await _context.SaveChangesAsync();
                 return Ok();
