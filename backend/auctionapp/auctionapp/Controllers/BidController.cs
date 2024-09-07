@@ -42,6 +42,12 @@ namespace auctionapp.Controllers
                     .Include(auction => auction.Bidrecords)
                     .FirstOrDefaultAsync(auction => auction.Itemid == bidData.itemId);
 
+                auction.Currenthighestbiduserid = bidData.userId;
+
+                _context.Auctions.Update(auction);
+
+                await _context.SaveChangesAsync();
+
                 if (auction == null)
                 {
                     return BadRequest(new { message = "Invaild Auction!" });

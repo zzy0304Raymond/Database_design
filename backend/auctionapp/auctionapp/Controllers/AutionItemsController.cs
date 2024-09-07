@@ -234,9 +234,11 @@ namespace auctionapp.Controllers
 
                 if (firstValidItemId.Any())
                 {
+                    var auc = _context.Auctions.FirstOrDefaultAsync(a => a.Itemid == firstValidItemId.FirstOrDefault());
                     var Dto = new DelDto
                     {
-                        itemId = firstValidItemId.FirstOrDefault()
+                        itemId = firstValidItemId.FirstOrDefault(),
+                        userId = auc.Result.Currenthighestbiduserid??0
                     };
                     return Ok(Dto);
                 }
@@ -397,6 +399,7 @@ namespace auctionapp.Controllers
     public class DelDto
     {
         public decimal itemId { get; set; }
+        public decimal userId { get; set; }
     }
 
 }
