@@ -256,8 +256,6 @@ export default {
     goToPayment(order) {
       this.$router.push({ name: 'Payment', params: { orderId: order.orderId } });
     },
-
-
     
   },
 };

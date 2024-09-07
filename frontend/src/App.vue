@@ -46,7 +46,6 @@ export default {
             this.auctionItemId = response.data.itemId; // 将返回的数据存储为id
             this.callAnotherApi(this.auctionItemId); // 调用第二个API，传递id参数
           } else {
-  
             console.log(response.data.itemId);
             console.log('条件未满足，继续循环，返回的ID:', this.auctionItemId);
           }
