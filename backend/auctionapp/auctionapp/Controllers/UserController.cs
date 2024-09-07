@@ -71,17 +71,34 @@ namespace auctionapp.Controllers
             {
                 return BadRequest(new { message = "Invalid input data." });
             }
+
+            // 检查用户名和邮箱是否已经存在
+            var existingUserByUsername = await _context.Users.FirstOrDefaultAsync(u => u.Username == newuser.username);
+            var existingUserByEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == newuser.email);
+
+            if (existingUserByUsername != null)
+            {
+                return BadRequest(new { message = "Username already exists." });
+            }
+
+            if (existingUserByEmail != null)
+            {
+                return BadRequest(new { message = "Email already exists." });
+            }
+
             try
             {
+                // 获取当前最大的 Userid 并加 1
+                var maxUserId = await _context.Users.MaxAsync(u => (decimal?)u.Userid) ?? 0;
                 var user = new User
                 {
-                    Userid =  _context.Users.Max(u => u.Userid)+1,
+                    Userid = maxUserId + 1,
                     Username = newuser.username,
                     Email = newuser.email,
                     Password = newuser.password,
                     Registrationdate = DateTime.UtcNow
                 };
-                System.Console.WriteLine(user.Userid);
+
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
@@ -92,11 +109,11 @@ namespace auctionapp.Controllers
                 var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 // 日志记录错误信息
                 Console.WriteLine(errorMessage);
-                // 根据错误信息给用户反馈或者进行其他处理
-                return BadRequest(errorMessage);
+                // 返回错误信息
+                return BadRequest(new { message = "An error occurred while registering the user." });
             }
-
         }
+
 
 
         //获取用户资料
