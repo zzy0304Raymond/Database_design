@@ -19,7 +19,6 @@ namespace auctionapp.Controllers
         }
 
         //GET: api/auction-items/{itemId} 获取物品详细
-
         [HttpGet("{itemId}")]
         public async Task<IActionResult> GetAuctionItem(decimal itemId)
         {
@@ -75,7 +74,7 @@ namespace auctionapp.Controllers
             }
         }
 
-
+        //获取拍卖列表
         // GET: api/auction-items
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AuctionItemDto>>> GetAuctionItems()
@@ -102,6 +101,8 @@ namespace auctionapp.Controllers
             }
         }
 
+
+        //添加拍卖物品
         // POST: api/auction-items
         [HttpPost]
         public async Task<ActionResult<AuctionItemDto>> AddAuctionItem([FromBody] CreateAuctionItemDto newItem)
@@ -113,17 +114,30 @@ namespace auctionapp.Controllers
 
             try
             {
+                var max = _context.Users.Max(max => max.Userid);
                 var item = new Item
                 {
-                    Itemid = 8,
+                    Itemid = max + 1,
                     Itemname = newItem.Name,
                     Description = "", // Adjust this if a description is needed
                     Startingprice = newItem.StartingBid,
-                    Postdate = DateTime.Parse(newItem.PostTime),
-                    Image = newItem.ImageUrl != "" ? Convert.FromBase64String(newItem.ImageUrl.Replace("data:image/png;base64,", "")) : null
+                    Postdate = DateTime.Now,
+                    Image = Convert.FromBase64String(newItem.ImageUrl)
+                };
+                var auction = new Auction
+                {
+                    Auctionid = (_context.Auctions.Any() ? _context.Auctions.Max(m => m.Auctionid + 1) : 1),
+                    Itemid = item.Itemid,
+                    Starttime = DateTime.Now,
+                    Endtime = newItem.EndTime,
+                    Currenthighestbid = newItem.StartingBid,
+                    Currenthighestbiduser = null,
+                    Currenthighestbiduserid = 0,
+                    Item= item
                 };
 
                 _context.Items.Add(item);
+                _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
 
                 var createdItem = new AuctionItemDto
@@ -133,7 +147,7 @@ namespace auctionapp.Controllers
                     StartingBid = item.Startingprice ?? 0,
                     Category = newItem.Category,
                     PostTime = item.Postdate.ToString(),
-                    ImageUrl = newItem.ImageUrl
+                    ImageUrl = null
                 };
 
                 return CreatedAtAction(nameof(GetAuctionItems), new { id = item.Itemid }, createdItem);
@@ -144,6 +158,7 @@ namespace auctionapp.Controllers
             }
         }
 
+        //更新拍卖物品
         // PUT: api/auction-items/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<AuctionItemDto>> UpdateAuctionItem(decimal id, [FromBody] CreateAuctionItemDto updatedItem)
@@ -163,7 +178,7 @@ namespace auctionapp.Controllers
 
                 item.Itemname = updatedItem.Name;
                 item.Startingprice = updatedItem.StartingBid;
-                item.Postdate = DateTime.Parse(updatedItem.PostTime);
+                item.Postdate = DateTime.Now;
                 item.Image = updatedItem.ImageUrl != null ? Convert.FromBase64String(updatedItem.ImageUrl.Replace("data:image/png;base64,", "")) : null;
 
                 _context.Entry(item).State = EntityState.Modified;
@@ -187,6 +202,7 @@ namespace auctionapp.Controllers
             }
         }
 
+        //删除拍卖物品
         // DELETE: api/auction-items/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuctionItem(decimal id)
@@ -210,6 +226,8 @@ namespace auctionapp.Controllers
             }
         }
 
+
+        //获取图片
         // GET: api/auction-items/image/{id}
         [HttpGet("image/{id}")]
         public async Task<ActionResult<object>> GetAuctionItemImage(decimal id)
@@ -266,6 +284,8 @@ namespace auctionapp.Controllers
         //}
 
 
+
+        //获取出价记录
         [HttpGet("{Bidid}/bids")]
         public async Task<IActionResult> GetBidHistory(decimal bidId)
         {
@@ -314,7 +334,7 @@ namespace auctionapp.Controllers
         public string Name { get; set; }
         public decimal StartingBid { get; set; }
         public string Category { get; set; }
-        public string PostTime { get; set; }
+        public DateTime EndTime { get; set; }
         public string ImageUrl { get; set; }
     }
 

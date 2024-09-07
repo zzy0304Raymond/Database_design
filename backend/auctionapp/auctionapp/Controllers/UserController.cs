@@ -33,7 +33,7 @@ namespace auctionapp.Controllers
             }
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(user => user.Email==loginDto.email);
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.email);
                 if (user == null)
                 {
                     return NotFound(new { message = "Email does not exist !" });
@@ -64,34 +64,39 @@ namespace auctionapp.Controllers
         }
 
 
-        //[HttpPost("register")]
-        //public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto newuser)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(new { message = "Invalid input data." });
-        //    }
-        //    try
-        //    {
-        //        var user = new User
-        //        {
-        //            Userid=User
-        //            Username = newuser.username,
-        //            Email = newuser.email,
-        //            Password = newuser.password,
-        //            Registrationdate = DateTime.UtcNow
-        //        };
-        //        _context.Users.Add(user);
-        //        await _context.SaveChangesAsync();
+        [HttpPost("register")]
+        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto newuser)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input data." });
+            }
+            try
+            {
+                var user = new User
+                {
+                    Userid =  _context.Users.Max(u => u.Userid)+1,
+                    Username = newuser.username,
+                    Email = newuser.email,
+                    Password = newuser.password,
+                    Registrationdate = DateTime.UtcNow
+                };
+                System.Console.WriteLine(user.Userid);
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
-        //        return CreatedAtAction(nameof(Register), new { id = user.Userid }, new UserDto { id = user.Userid, username = user.Username, email = user.Email });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { message = "An error occurred while adding a new user!" });
-        //    }
+                return CreatedAtAction(nameof(Register), new { id = user.Userid }, new UserDto { id = user.Userid, username = user.Username, email = user.Email });
+            }
+            catch (DbUpdateException ex)
+            {
+                var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                // 日志记录错误信息
+                Console.WriteLine(errorMessage);
+                // 根据错误信息给用户反馈或者进行其他处理
+                return BadRequest(errorMessage);
+            }
 
-        //}
+        }
 
 
         //获取用户资料
@@ -195,7 +200,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500,ex.Message);
+                return StatusCode(500, ex.Message);
                 //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == userId);
                 //if (user == null)
                 //{
