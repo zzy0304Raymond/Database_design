@@ -31,17 +31,18 @@ namespace auctionapp.Controllers
             }
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email==loginDto.email);
+                var user = await _context.Users
+                    .Include(user => user.Admins)
+                    .FirstOrDefaultAsync(u => u.Email==loginDto.email);
                 if (user == null)
                 {
                     return BadRequest(new { message = "Illegal email!" });
                 }
-                Console.WriteLine(user.Userid);                
-                //else if (user.Admins.Count == 0)
-                //{
-                //    return BadRequest(new { message = " Not Admin Permission!" });
-                //}
-                //else
+                else if (user.Admins.Count == 0)
+                {
+                    return BadRequest(new { message = " Not Admin Permission!" });
+                }
+                else
                 {
                     if (!VerifyPassword(loginDto.password, user.Password))
                     {
@@ -49,8 +50,8 @@ namespace auctionapp.Controllers
                     }
                     else
                     {
-                        var token = GenerateJwtToken(user);
-                        return Ok(new AdminLoginDto { token = token });
+                        var adlogindto = new AdminLoginDto { message = "Login successfully" };
+                        return Ok(adlogindto);
                     }
                 }
 
@@ -81,23 +82,7 @@ namespace auctionapp.Controllers
             return password == storedPassword;
         }
 
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("j9b8v7x6u5t4s3r2n1m0k0l8j6f4d2b0a9s8d7c6v5b4n3m2"); // Replace with your actual secret key
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                new Claim(ClaimTypes.NameIdentifier, user.Userid.ToString("D")),
-                new Claim(ClaimTypes.Name, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddHours(2), // Token expiration time
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+        
 
 
     }
@@ -114,6 +99,5 @@ public class LoginDto
 
 public class AdminLoginDto
 {
-    public string token { get; set; }
+    public string message;
 }
-

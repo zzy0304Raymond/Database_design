@@ -33,7 +33,7 @@ namespace auctionapp.Controllers
             }
             try
             {
-                var user = await _context.Users.FindAsync(loginDto.email);
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.email);
                 if (user == null)
                 {
                     return NotFound(new { message = "Email does not exist !" });
@@ -51,7 +51,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while logging in!" });
+                return StatusCode(500, ex.Message);
             }
             //var user = await _context.Users.FindAsync(loginDto.)
             //if (user == null || !VerifyPassword(loginDto.Password, user.Password))
@@ -75,25 +75,33 @@ namespace auctionapp.Controllers
             {
                 var user = new User
                 {
+                    Userid =  _context.Users.Max(u => u.Userid)+1,
                     Username = newuser.username,
                     Email = newuser.email,
                     Password = newuser.password,
                     Registrationdate = DateTime.UtcNow
                 };
+                System.Console.WriteLine(user.Userid);
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(Register), new { id = user.Userid }, new UserDto { id = user.Userid, username = user.Username, email = user.Email });
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
-                return StatusCode(500, new { message = "An error occurred while adding a new user!" });
+                var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                // 日志记录错误信息
+                Console.WriteLine(errorMessage);
+                // 根据错误信息给用户反馈或者进行其他处理
+                return BadRequest(errorMessage);
             }
 
         }
 
+
+        //获取用户资料
         [HttpGet("users/{userId}")]
-        public async Task<ActionResult<UserDetailsDto>> GetUser(string userId)
+        public async Task<ActionResult<UserDetailsDto>> GetUser(decimal userId)
         {
             if (!ModelState.IsValid)
             {
@@ -119,7 +127,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while fetching User." });
+                return StatusCode(500, ex.Message);
             }
             //var user = await _context.Users.Include(u => u.Items).Include(u => u.Auctions).Include(u => u.Feedbackpublishes).Include(u => u.TransactionBuyerusers).Include(u => u.TransactionSellerusers).Include(u => u.Notifications).FirstOrDefaultAsync(u => u.Userid == userId);
             //if (user == null)
@@ -138,7 +146,7 @@ namespace auctionapp.Controllers
             //});
         }
 
-
+        //获取用户出价历史
         [HttpGet("users/{userId}/bids")]
         public async Task<ActionResult<IEnumerable<BidHistoryDto>>> GetUserBids(decimal userId)
         {
@@ -159,7 +167,7 @@ namespace auctionapp.Controllers
 
 
         [HttpPut("users/{userId}")]
-        public async Task<ActionResult<UserDto>> UpdateUser(string userId, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<ActionResult<UserDto>> UpdateUser(decimal userId, [FromBody] UpdateUserDto updateUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -192,7 +200,7 @@ namespace auctionapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating the User" });
+                return StatusCode(500, ex.Message);
                 //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == userId);
                 //if (user == null)
                 //{

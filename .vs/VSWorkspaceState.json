@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\backend\\auctionapp",
+    "\\backend\\auctionapp\\auctionapp",
+    "\\backend\\auctionapp\\auctionapp\\Controllers",
+    "\\backend\\auctionapp\\auctionapp\\Models",
+    "\\backend\\backend",
+    "\\backend\\backend\\auctionapp\\auctionapp",
+    "\\backend\\backend\\auctionapp\\auctionapp\\obj",
+    "\\backend\\backend\\auctionapp\\auctionapp\\Properties"
+  ],
+  "SelectedNode": "\\backend\\auctionapp\\auctionapp\\Models\\Admin.cs",
+  "PreviewInSolutionExplorer": false
+}
