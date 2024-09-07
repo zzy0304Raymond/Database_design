@@ -87,7 +87,7 @@ namespace auctionapp.Controllers
                         Id = item.Itemid,
                         Name = item.Itemname,
                         StartingBid = item.Startingprice ?? 0,
-                        Category = "", // Assuming no category column, adjust if necessary
+                        Category = item.Category,
                         PostTime = item.Postdate.ToString(), // Adjust based on the actual data type
                         ImageUrl = item.Image != null ? $"data:image/png;base64,{Convert.ToBase64String(item.Image)}" : ""
                     })
@@ -129,15 +129,14 @@ namespace auctionapp.Controllers
                 await _context.SaveChangesAsync();
                 var auction = new Auction
                 {
-                    Auctionid = (_context.Auctions.Any() ? (_context.Auctions.Max(m => m.Auctionid ) + 1) : 1),
+                    Auctionid = (_context.Auctions.Any() ? (_context.Auctions.Max(m => m.Auctionid) + 1) : 1),
                     Itemid = item.Itemid,
                     Starttime = DateTime.Now,
                     Endtime = DateTime.Parse(newItem.EndTime),
                     Currenthighestbid = newItem.StartingBid,
                     Currenthighestbiduserid = 4,
-                    Item= item
+                    Item = item
                 };
-                
 
 
                 _context.Auctions.Add(auction);
@@ -219,7 +218,7 @@ namespace auctionapp.Controllers
                 }
 
                 _context.Items.Remove(item);
-               
+
                 await _context.SaveChangesAsync();
                 return Ok();
             }
@@ -324,7 +323,7 @@ namespace auctionapp.Controllers
     }
 
     // DTO class to match the API response format
-    public class    AuctionItemDto
+    public class AuctionItemDto
     {
         public decimal Id { get; set; }
         public string Name { get; set; }
